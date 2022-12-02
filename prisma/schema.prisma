@@ -10,10 +10,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Example {
-  id        String   @id @default(cuid())
+model Lobby {
+  id        String   @id 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  name      String
 }
 
 // Necessary for Next auth
