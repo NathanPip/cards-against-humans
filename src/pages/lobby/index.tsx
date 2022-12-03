@@ -16,10 +16,15 @@ const Lobby: NextPage = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        try{
         if(!input.current || !input.current.value) return;
         const lobbyID = uuid();
         await lobbyMutation.mutateAsync({name: input.current.value, id: lobbyID});
+        console.log("completed");
         router.push(`/lobby/${lobbyID}`);
+        } catch(e) {
+            console.log(e);
+        }
     }
 
     return (
