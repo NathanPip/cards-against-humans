@@ -1,5 +1,4 @@
 import { type Lobby } from "@prisma/client";
-import { useRouter } from "next/router";
 import { useOthers, useMyPresence, useStorage } from "../liveblocks.config";
 
 type GameScreenProps = {
@@ -7,13 +6,9 @@ type GameScreenProps = {
 }
 
 const LobbyScreen: React.FC<GameScreenProps> = ({lobby}) => {
-  const router = useRouter();
-  const { id } = router.query;
   const title = useStorage(root => root.name);
-  // const [myPresence, updateMyPresence] = useMyPresence();
+  const [myPresence, updateMyPresence] = useMyPresence();
   const others = useOthers();
-
-  if (!id || Array.isArray(id)) return null;
 
   return (
     <>
