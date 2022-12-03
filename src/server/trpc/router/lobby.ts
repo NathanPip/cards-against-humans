@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createRoom, setInitialRoomStorage } from "../../../utils/liveblocksUtils";
+import { createRoom, getExistingRoom, setInitialRoomStorage } from "../../../utils/liveblocksUtils";
 
 import { router, publicProcedure } from "../trpc";
 
@@ -28,10 +28,18 @@ export const lobbyRouter = router({
   getLobby: publicProcedure
     .input(z.object({ id: z.string().nullish() }))
     .query(async ({ input, ctx }) => {
+      try {
       if (!input.id) return null;
       const lobby = await ctx.prisma.lobby.findUnique({
         where: { id: input.id },
       });
+      await getExistingRoom(input.id);
       return lobby;
+    } catch (error) {
+      let message
+      if (error instanceof Error) message = error.message
+      else message = String(error)
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: message });
+    }
     }),
 });

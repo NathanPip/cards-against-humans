@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
-import LobbyScreen from "../../../components/GameScreen";
+import LobbyScreen from "../../../components/LobbyScreen";
 import { type Presence, RoomProvider } from "../../../liveblocks.config";
 import { trpc } from "../../../utils/trpc";
 
