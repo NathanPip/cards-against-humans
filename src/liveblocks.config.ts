@@ -1,9 +1,36 @@
-import { createClient } from "@liveblocks/client";
+import { createClient, type LiveList, type LiveObject } from "@liveblocks/client";
 import { createRoomContext } from "@liveblocks/react";
 
-
 const client = createClient({
-    publicApiKey: "pk_dev_QITbJuUdEm4yTqHo3K0X8C9wj_zUhT6zde13RVdNBg9GI2iYSgfQPpQnDhpNgD44"
-})
+  publicApiKey:
+    "pk_dev_QITbJuUdEm4yTqHo3K0X8C9wj_zUhT6zde13RVdNBg9GI2iYSgfQPpQnDhpNgD44",
+});
 
-export const {suspense: {RoomProvider, useOthers, useUpdateMyPresence}} = createRoomContext(client);
+export type Presence = {
+  name: string;
+  score?: number;
+  isHost?: boolean;
+  CAH?: {
+    whites: string[];
+    blacks: string[];
+    turn: boolean;
+  };
+};
+
+export type Storage = {
+  name: string;
+  owner: string;
+  currentGame: null | "CAH";
+  CAH: LiveObject<{
+    currentPlayableBlacks?: LiveList<
+      LiveObject<{ id: string; type: "black"; text: string; packId: string }>
+    >;
+    currentPlayableWhites?: LiveList<
+      LiveObject<{ id: string; type: "white"; text: string; packId: string }>
+    >;
+  }>;
+};
+
+export const {
+  suspense: { RoomProvider, useMyPresence, useOthers, useStorage },
+} = createRoomContext<Presence, Storage>(client);

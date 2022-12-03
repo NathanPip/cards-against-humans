@@ -3,12 +3,11 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
-import GameScreen from "../../../components/GameScreen";
-import { RoomProvider } from "../../../liveblocks.config";
-import { type Player } from "../../../types/player";
+import LobbyScreen from "../../../components/GameScreen";
+import { type Presence, RoomProvider } from "../../../liveblocks.config";
 import { trpc } from "../../../utils/trpc";
 
-const defaultPlayer: Player = {
+const defaultPlayer: Presence = {
     name: "",
     score: 0,
     isHost: false,
@@ -27,16 +26,18 @@ const GameRoom: NextPage = () => {
   const [name, setName] = useState<string | undefined | null>(session.data?.user?.name)
   const [isHost] = useState(lobby ? lobby.data?.userId === session.data?.user?.id : false);
 
-  if (!id || Array.isArray(id) || !lobby?.data) return null;
+  if (!id || Array.isArray(id) || lobby.isLoading) return <>loading</>;
 
-  if(!lobby.data.id) return <>None Found</>
+  if(lobby.error || lobby.isLoadingError) return <>error</>
+
+  if(!lobby.data?.id) return <>None Found</>
 
   return (
     <>
     { name || session.data?.user?.id ?
-      <RoomProvider id={id} initialPresence={{ ...defaultPlayer, name: session.data?.user?.name || name, isHost: isHost } as Player}>
+      <RoomProvider id={id} initialPresence={{ ...defaultPlayer, name: session.data?.user?.name || name || "unknown", isHost: isHost }}>
         <ClientSideSuspense fallback={<div>Loading...</div>}>
-          {() => <GameScreen lobby={lobby.data} />}
+          {() => <LobbyScreen lobby={lobby.data} />}
         </ClientSideSuspense>
       </RoomProvider>
     : <NameInput setName={setName} /> }

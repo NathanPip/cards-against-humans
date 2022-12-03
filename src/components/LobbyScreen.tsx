@@ -1,25 +1,23 @@
 import { type Lobby } from "@prisma/client";
 import { useRouter } from "next/router";
-import { useOthers, useUpdateMyPresence } from "../liveblocks.config";
+import { useOthers, useMyPresence, useStorage } from "../liveblocks.config";
 
 type GameScreenProps = {
   lobby: Lobby | null,
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({lobby}) => {
+const LobbyScreen: React.FC<GameScreenProps> = ({lobby}) => {
   const router = useRouter();
   const { id } = router.query;
-  const updateMyPresence = useUpdateMyPresence();
+  const title = useStorage(root => root.name);
+  // const [myPresence, updateMyPresence] = useMyPresence();
   const others = useOthers();
-
 
   if (!id || Array.isArray(id)) return null;
 
   return (
     <>
-      <button onClick={() => updateMyPresence({ name: "" })}>
-        {lobby?.name}
-      </button>
+      <h1>{title}</h1>
       {others.map(({ connectionId, presence }) =>
         presence.name ? (
           <p key={connectionId}>
@@ -31,4 +29,4 @@ const GameScreen: React.FC<GameScreenProps> = ({lobby}) => {
   );
 };
 
-export default GameScreen;
+export default LobbyScreen;
