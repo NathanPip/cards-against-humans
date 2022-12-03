@@ -1,4 +1,4 @@
-import { Lobby } from "@prisma/client";
+import { type Lobby } from "@prisma/client";
 import { useRouter } from "next/router";
 import { useOthers, useUpdateMyPresence } from "../liveblocks.config";
 
@@ -18,13 +18,12 @@ const GameScreen: React.FC<GameScreenProps> = ({lobby}) => {
   return (
     <>
       <button onClick={() => updateMyPresence({ name: "" })}>
-        GameRoom: {id}
+        {lobby?.name}
       </button>
       {others.map(({ connectionId, presence }) =>
-        presence.rand ? (
+        presence.name ? (
           <p key={connectionId}>
-            {connectionId}:{" "}
-            {typeof presence.rand === "number" ? presence.rand : null}
+            {typeof presence.name === "string" ? presence.name : null}
           </p>
         ) : null
       )}

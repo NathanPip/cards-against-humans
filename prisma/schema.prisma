@@ -18,6 +18,33 @@ model Lobby {
   userId    String
 }
 
+model CAHPack {
+  id         String         @id
+  createdAt  DateTime       @default(now())
+  name       String
+  whiteCards CAHWhiteCard[]
+  blackCards CAHBlackCard[]
+  official   Boolean        @default(false)
+}
+
+model CAHWhiteCard {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  text      String   @db.MediumText
+  type      String   @default("white")
+  pack      CAHPack  @relation(fields: [packId], references: [id])
+  packId    String
+}
+
+model CAHBlackCard {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  text      String   @db.MediumText
+  type      String   @default("black")
+  pack      CAHPack  @relation(fields: [packId], references: [id])
+  packId    String
+}
+
 // Necessary for Next auth
 model Account {
   id                String  @id @default(cuid())
