@@ -1,15 +1,12 @@
-import { CAHPack } from "@prisma/client"
+import { LiveObject, type LiveList } from "@liveblocks/client"
 
 export type CAHGame = {
     whites: string[],
     blacks: string[]
 }
 
-type GameOptions = {
+export type CAHGameOptions = LiveObject<{
     pointsToWin: number
-} 
-
-export interface CAHGameOptions extends GameOptions {
     whiteCardsPerPlayer: number,
-    cardPacks: string[]
-}
+    cardPacks: LiveList<string>
+}>

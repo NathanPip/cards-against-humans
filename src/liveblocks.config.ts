@@ -22,6 +22,11 @@ export type Storage = {
   owner: string;
   currentGame: null | "CAH";
   CAH: LiveObject<{
+    options: LiveObject<{
+      pointsToWin: number;
+      whiteCardsPerPlayer: number;
+      cardPacks: LiveList<string>;
+    }>
     currentPlayableBlacks?: LiveList<
       LiveObject<{ id: string; type: "black"; text: string; packId: string }>
     >;

@@ -1,3 +1,4 @@
+import { LiveList, LiveObject } from "@liveblocks/client";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useRef, useState } from "react";
 import { useMutation as liveblocksMutation} from "../liveblocks.config";
@@ -48,11 +49,11 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({data}) => {
         const cardsPerPlayer = cardsPerPlayerInput.current?.value;
         const cardPacks = cardPacksSelect.current?.value;
         
-        const gameOptions: CAHGameOptions = {
+        const gameOptions: CAHGameOptions = new LiveObject({
             pointsToWin: pointsToWin ? parseInt(pointsToWin) : 10,
             whiteCardsPerPlayer: cardsPerPlayer ? parseInt(cardsPerPlayer) : 10,
-            cardPacks: cardPacks ? [cardPacks] : []
-        }
+            cardPacks: cardPacks ? new LiveList([cardPacks]) : new LiveList([])
+        })
         setOptions(gameOptions);
         setisPlaying();
     }

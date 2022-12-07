@@ -58,7 +58,10 @@ const initialRoomStorageBody = {
         options: {
           pointsToWin: 10,
           whiteCardsPerPlayer: 10,
-          cardPacks: [],
+          cardPacks: {
+            liveblocksType: "LiveList",
+            data: [],
+          },
         },
         currentPlayableBlacks: {
           liveblocksType: "LiveList",
