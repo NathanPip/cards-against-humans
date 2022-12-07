@@ -32,5 +32,5 @@ export type Storage = {
 };
 
 export const {
-  suspense: { RoomProvider, useMyPresence, useOthers, useStorage },
+  suspense: { RoomProvider, useMyPresence, useOthers, useStorage, useMutation },
 } = createRoomContext<Presence, Storage>(client);
