@@ -41,85 +41,95 @@ export const createRoom = async (
   });
 };
 
-type InitialRoomStorage = {
-    name: string;
-    owner: string;
-    currentGame?: null | "CAH";
-    CAH?: {
-      currentPlayableBlacks?: CAHBlackCard[];
-      currentPlayableWhites?: CAHWhiteCard[];
-    };
-  };
+type InitialRoomStorageParams = {
+  name: string;
+  owner: string;
+};
 
 const initialRoomStorageBody = {
-    liveblocksType: "LiveObject",
-    data: {
-      name: "",
-      owner: "",
-      currentGame: null,
-      CAH: {
-        liveblocksType: "LiveObject",
-        data: {
-          currentPlayableBlacks: {
-            liveblocksType: "LiveList",
-            data: [],
-          },
-          currentPlayableWhites: {
+  liveblocksType: "LiveObject",
+  data: {
+    name: "",
+    owner: "",
+    currentGame: null,
+    CAH: {
+      liveblocksType: "LiveObject",
+      data: {
+        options: {
+          pointsToWin: 10,
+          whiteCardsPerPlayer: 10,
+          cardPacks: {
             liveblocksType: "LiveList",
             data: [],
           },
         },
+        currentPlayableBlacks: {
+          liveblocksType: "LiveList",
+          data: [],
+        },
+        currentPlayableWhites: {
+          liveblocksType: "LiveList",
+          data: [],
+        },
       },
     },
-  };
+  },
+};
 
 export const setInitialRoomStorage = async (
   roomId: string,
-  initialRoomStorage: InitialRoomStorage
+  initialRoomStorage: InitialRoomStorageParams
 ): Promise<boolean> => {
   return new Promise(async (resolve, reject) => {
     try {
       initialRoomStorageBody.data.name = initialRoomStorage.name;
       initialRoomStorageBody.data.owner = initialRoomStorage.owner;
-      const storageRes = await fetch(`https://api.liveblocks.io/v2/rooms/${roomId}/storage`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${env.LIVEBLOCKS_SECRET_KEY}`,
-        },
-        body: JSON.stringify(initialRoomStorageBody),
-      });
-      const data = await storageRes.json();
+      const storageRes = await fetch(
+        `https://api.liveblocks.io/v2/rooms/${roomId}/storage`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${env.LIVEBLOCKS_SECRET_KEY}`,
+          },
+          body: JSON.stringify(initialRoomStorageBody),
+        }
+      );
+      const data = (await storageRes.json()) as typeof initialRoomStorageBody;
       console.log(data);
       resolve(true);
     } catch (error) {
-      reject(error)
+      reject(error);
       console.log(error);
     }
   });
 };
 
 type GetExistingRoomResponse = {
-    type: "room";
-    id: string;
-    lastConnectionAt: Date;
-    createdAt: Date;
-    metadata?: object;
-    defaultAccesses: [] | ["room:write"];
-    userAccesses?: { [key: string]: [] | ["room:write"] };
-    groupAccesses?: { [key: string]: [] | ["room:write"] };
-}
+  type: "room";
+  id: string;
+  lastConnectionAt: Date;
+  createdAt: Date;
+  metadata?: object;
+  defaultAccesses: [] | ["room:write"];
+  userAccesses?: { [key: string]: [] | ["room:write"] };
+  groupAccesses?: { [key: string]: [] | ["room:write"] };
+};
 
-export const getExistingRoom = async (roomId: string): Promise<GetExistingRoomResponse> => {
-    return new Promise(async (resolve, reject) => {
-        try{
-            const response = await fetch(`https://api.liveblocks.io/v2/rooms/${roomId}`, {});
-            const data = (await response.json()) as GetExistingRoomResponse;
-            resolve(data);
-        }
-        catch(error){
-            reject(error);
-            console.log(error);
-        }
-    })
-}
+export const getExistingRoom = async (
+  roomId: string
+): Promise<GetExistingRoomResponse> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch(
+        `https://api.liveblocks.io/v2/rooms/${roomId}`,
+        {}
+      );
+      const data = (await response.json()) as GetExistingRoomResponse;
+      resolve(data);
+    } catch (error) {
+      reject(error);
+      console.log(error);
+    }
+  });
+};

@@ -24,7 +24,6 @@ const GameRoom: NextPage = () => {
   const lobby = trpc.lobby.getLobby.useQuery({id: (id as string)});
   const session = useSession();
   const [name, setName] = useState<string | undefined | null>(session.data?.user?.name)
-  const [isHost] = useState(lobby ? lobby.data?.userId === session.data?.user?.id : false);
 
   if (!id || Array.isArray(id) || lobby.isLoading) return <>loading</>;
 
@@ -35,7 +34,7 @@ const GameRoom: NextPage = () => {
   return (
     <>
     { name || session.data?.user?.id ?
-      <RoomProvider id={id} initialPresence={{ ...defaultPlayer, name: session.data?.user?.name || name || "unknown", isHost: isHost }}>
+      <RoomProvider id={id} initialPresence={{ ...defaultPlayer, name: session.data?.user?.name || name || "unknown", isHost: lobby.data.userId === session.data?.user?.id }}>
         <ClientSideSuspense fallback={<div>Loading...</div>}>
           {() => <LobbyScreen lobby={lobby.data} />}
         </ClientSideSuspense>
