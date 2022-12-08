@@ -8,5 +8,6 @@ export type CAHGame = {
 export type CAHGameOptions = LiveObject<{
     pointsToWin: number
     whiteCardsPerPlayer: number,
-    cardPacks: LiveList<string>
+    whiteCardIds: LiveList<string>,
+    blackCardIds: LiveList<string>
 }>

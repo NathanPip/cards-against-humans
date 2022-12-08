@@ -6,24 +6,35 @@ export const gameRouter = router({
   getBasicGameInfo: publicProcedure
     .input(z.object({ name: z.string() }))
     .query(async ({ input, ctx }) => {
-      try {
-        if (input.name === "CAH") {
-          const cardPacks = await ctx.prisma.cAHPack.findMany({
-            include: {
-              _count: {
-                select: { whiteCards: true, blackCards: true },
-              },
+      console.log(input.name)
+      if (input.name === "Cards Against Humanity") {
+        const cardPacks = await ctx.prisma.cAHPack.findMany({
+          include: {
+            _count: {
+              select: { whiteCards: true, blackCards: true },
             },
-          });
-          return { cardPacks };
-        } else {
-            throw new TRPCError({ code: "NOT_FOUND" });
-        }
-      } catch (err) {
-        let message;
-        if (err instanceof Error) message = err.message;
-        else message = String(err);
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: message });
+          },
+        });
+        return { cardPacks };
+      } else {
+        throw new TRPCError({ code: "NOT_FOUND" });
       }
+    }),
+  getSelectedCardPacks: publicProcedure
+    .input(z.array(z.string()).nullish())
+    .query(async ({ input, ctx }) => {
+      if(!input) return null;
+      const cardPacks = await ctx.prisma.cAHPack.findMany({
+        where: {
+          id: {
+            in: input,
+          },
+        },
+        include: {
+          blackCards: true,
+          whiteCards: true,
+        },
+      });
+      return { cardPacks };
     }),
 });
