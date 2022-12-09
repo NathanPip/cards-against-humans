@@ -1,8 +1,9 @@
 import { LiveList, LiveObject } from "@liveblocks/client";
 import { type inferRouterOutputs } from "@trpc/server";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { z } from "zod";
 import { useMutation as liveblocksMutation } from "../liveblocks.config";
+import { LobbyContext } from "../pages/lobby/id";
 import { type AppRouter } from "../server/trpc/router/_app";
 import { type CAHGameOptions } from "../types/game";
 import { trpc } from "../utils/trpc";
@@ -41,7 +42,8 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   const pointsToWinInput = useRef<HTMLInputElement>(null);
   const cardsPerPlayerInput = useRef<HTMLInputElement>(null);
   const cardPacksSelect = useRef<HTMLFieldSetElement>(null);
-  const gameRouterContext = trpc.useContext().game;
+  const trpcContext = trpc.useContext();
+  const lobby = useContext(LobbyContext);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -75,9 +77,10 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
         .map((e: HTMLInputElement) => e.value);
 
       // ERROR NEEDS TO BE SET WITH TRY CATCH
-      const packData = await gameRouterContext.getSelectedCardPacks.fetch(
+      const packData = await trpcContext.game.getSelectedCardPacks.fetch(
         cardPacks
       );
+      const playerData = await trpcContext.lobby.getRoom.fetch(lobby!.id);
       if (!packData) throw new Error("No card packs found");
       const whiteCardIds: string[] = [];
       const blackCardIds: string[] = [];

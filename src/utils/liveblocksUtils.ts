@@ -1,4 +1,5 @@
 import type { CAHBlackCard, CAHWhiteCard } from "@prisma/client";
+import { z } from "zod";
 import { env } from "../env/server.mjs";
 
 type CreateRoomParams = {
@@ -76,6 +77,36 @@ const initialRoomStorageBody = {
   },
 };
 
+const initialRoomStorageBodyParser = z.object({
+  liveblocksType: z.literal("LiveObject"),
+  data: z.object({
+    name: z.string(),
+    owner: z.string().cuid(),
+    currentGame: z.literal("Cards Against Humanity").nullish(),
+    CAH: z.object({
+      liveblocksType: z.literal("LiveObject"),
+      data: z.object({
+        options: z.object({
+          pointsToWin: z.number().min(1).max(100),
+          whiteCardsPerPlayer: z.number().min(1).max(25),
+          cardPacks: z.object({
+            liveblocksType: z.literal("LiveList"),
+            data: z.array(z.string()),
+          }),
+        }),
+        currentPlayableBlacks: z.object({
+          liveblocksType: z.literal("LiveList"),
+          data: z.array(z.string()),
+        }),
+        currentPlayableWhites: z.object({
+          liveblocksType: z.literal("LiveList"),
+          data: z.array(z.string()),
+        }),
+      }),
+    }),
+  }),
+});
+
 export const setInitialRoomStorage = async (
   roomId: string,
   initialRoomStorage: InitialRoomStorageParams
@@ -84,7 +115,10 @@ export const setInitialRoomStorage = async (
     try {
       initialRoomStorageBody.data.name = initialRoomStorage.name;
       initialRoomStorageBody.data.owner = initialRoomStorage.owner;
-      const storageRes = await fetch(
+
+      const parsedInitialStorageBody = initialRoomStorageBodyParser.parse(initialRoomStorageBody)
+
+      await fetch(
         `https://api.liveblocks.io/v2/rooms/${roomId}/storage`,
         {
           method: "POST",
@@ -92,11 +126,9 @@ export const setInitialRoomStorage = async (
             "Content-Type": "application/json",
             Authorization: `Bearer ${env.LIVEBLOCKS_SECRET_KEY}`,
           },
-          body: JSON.stringify(initialRoomStorageBody),
+          body: JSON.stringify(parsedInitialStorageBody),
         }
       );
-      const data = (await storageRes.json()) as typeof initialRoomStorageBody;
-      console.log(data);
       resolve(true);
     } catch (error) {
       reject(error);
@@ -108,8 +140,8 @@ export const setInitialRoomStorage = async (
 type GetExistingRoomResponse = {
   type: "room";
   id: string;
-  lastConnectionAt: Date;
-  createdAt: Date;
+  lastConnectionAt: string;
+  createdAt: string;
   metadata?: object;
   defaultAccesses: [] | ["room:write"];
   userAccesses?: { [key: string]: [] | ["room:write"] };
@@ -133,3 +165,31 @@ export const getExistingRoom = async (
     }
   });
 };
+
+const existingPlayersBodyParser = z.object({
+  data: z.array(z.object({
+    type: z.literal("user"),
+    connectionId: z.number(),
+    id: z.string(),
+    info: z.object({})
+  }))
+})
+
+type ExistingPlayersBody = typeof existingPlayersBodyParser._output.data;
+
+export const getConnectedPlayers = async (roomId: string): Promise<ExistingPlayersBody> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch(
+        `https://api.liveblocks.io/v2/rooms/${roomId}/active_users`,
+        {}
+      );
+      const data = await response.json();
+      const parsedData = existingPlayersBodyParser.parse(data)
+      resolve(parsedData.data);
+    } catch (error) {
+      reject(error);
+      console.log(error);
+    }
+  });
+}
