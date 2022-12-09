@@ -36,7 +36,7 @@ const GameRoom: NextPage = () => {
     { name || session.data?.user?.id ?
       <RoomProvider id={id} initialPresence={{ ...defaultPlayer, name: session.data?.user?.name || name || "unknown", isHost: lobby.data.userId === session.data?.user?.id }}>
         <ClientSideSuspense fallback={<div>Loading...</div>}>
-          {() => <LobbyScreen lobby={lobby.data} />}
+          {() => <LobbyScreen />}
         </ClientSideSuspense>
       </RoomProvider>
     : <NameInput setName={setName} /> }

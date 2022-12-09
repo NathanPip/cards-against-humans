@@ -11,6 +11,7 @@ export type Presence = {
   name: string;
   score?: number;
   isHost?: boolean;
+  currentActions?: string;
   CAH?: {
     whites: string[];
     blacks: string[];
@@ -28,5 +29,5 @@ export type Storage = {
 };
 
 export const {
-  suspense: { RoomProvider, useMyPresence, useOthers, useStorage, useMutation },
+  suspense: { RoomProvider, useMyPresence, useSelf, useOthersMapped, useStorage, useMutation },
 } = createRoomContext<Presence, Storage>(client);
