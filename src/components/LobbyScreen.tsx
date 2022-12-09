@@ -1,32 +1,22 @@
-import { type Lobby } from "@prisma/client";
-import { useOthers, useMyPresence, useStorage } from "../liveblocks.config";
-import Game from "./Game";
+import { useOthersMapped, useSelf, useStorage } from "../liveblocks.config";
+import GameSelect from "./GameSelect";
 
-type GameScreenProps = {
-  lobby: Lobby | null,
-}
-
-const LobbyScreen: React.FC<GameScreenProps> = ({lobby}) => {
+const LobbyScreen: React.FC = () => {
   const title = useStorage(root => root.name);
-  const [myPresence, updateMyPresence] = useMyPresence();
-  const others = useOthers();
+  const isHost = useSelf((me) => me.presence.isHost);
+  const others = useOthersMapped((other) => other.presence.name);
   const currentGame = useStorage(root => root.currentGame);
-  const options = useStorage(root => root.CAH.options);
+
+  if(currentGame) return (
+    <div> We got a new game {currentGame}</div>
+  )
 
   return (
     <>
       <h1>{title}</h1>
-      {others.map(({ connectionId, presence }) =>
-        presence.name ? (
-          <p key={connectionId}>
-            {typeof presence.name === "string" ? presence.name : null}
-          </p>
-        ) : null
-      )}
-      { currentGame ? 
-      <div> We got a new game {currentGame}</div> :
-      <Game name="Cards Against Humanity"></Game> 
-      }
+      {others.map((name) => (
+        <div key={name[0]}>{name[1]}</div>))}
+      {isHost && <GameSelect name="Cards Against Humanity"></GameSelect>} 
     </>
   );
 };
