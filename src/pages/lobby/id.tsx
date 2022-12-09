@@ -1,5 +1,5 @@
 import { ClientSideSuspense } from "@liveblocks/react";
-import { Lobby } from "@prisma/client";
+import { type Lobby } from "@prisma/client";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -12,11 +12,10 @@ const defaultPlayer: Presence = {
   name: "",
   score: 0,
   isHost: false,
-  CAH: {
-    whites: [],
-    blacks: [],
-    turn: false,
-  },
+  currentAction: "waiting",
+  CAHWhiteCardIds: [],
+  CAHBlackCardIds: [],
+  CAHturn: false,
 };
 
 export const LobbyContext = createContext<null | Lobby>(null);

@@ -31,12 +31,14 @@ type CAHOptionsProps = {
   data: inferRouterOutputs<AppRouter>["game"]["getBasicGameInfo"];
 };
 
-const FormOptionsInputs = z.object({
+const FormOptionsInputsParser = z.object({
   pointsToWin: z.number().min(1).max(100),
   whiteCardsPerPlayer: z.number().min(1).max(25),
   whiteCardIds: z.array(z.string().cuid()),
   blackCardIds: z.array(z.string().cuid()),
 });
+
+const ConnectedPlayersParser = z.array(z.string()).nonempty()
 
 const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   const pointsToWinInput = useRef<HTMLInputElement>(null);
@@ -47,16 +49,20 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
 
   const [error, setError] = useState<string | null>(null);
 
-  const setOptions = liveblocksMutation(({ storage }, options) => {
+  const setOptions = liveblocksMutation(({ storage }, options, players: string[]) => {
     //ERROR NEEDS TO BE SET WITH TRY CATCH
-    const parsedOptions = FormOptionsInputs.parse(options);
+    const parsedOptions = FormOptionsInputsParser.parse(options);
     const obj: CAHGameOptions = new LiveObject({
       pointsToWin: parsedOptions.pointsToWin,
       whiteCardsPerPlayer: parsedOptions.whiteCardsPerPlayer,
       whiteCardIds: new LiveList(parsedOptions.whiteCardIds),
       blackCardIds: new LiveList(parsedOptions.blackCardIds),
     });
+    const parsedPlayers = ConnectedPlayersParser.parse(players);
+    const playersList = new LiveList(parsedPlayers);
     storage.get("CAH").set("options", obj);
+    storage.get("CAH").set("connectedPlayers", playersList);
+    storage.get("CAH").set("currentPlayerDrawing", parsedPlayers[0]);
   }, []);
 
   const setisPlaying = liveblocksMutation(({ storage }) => {
@@ -80,7 +86,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
       const packData = await trpcContext.game.getSelectedCardPacks.fetch(
         cardPacks
       );
-      const playerData = await trpcContext.lobby.getRoom.fetch(lobby!.id);
+      const playerData = await (await trpcContext.lobby.getConnectedPlayers.fetch(lobby!.id)).map((player) => player.id);
       if (!packData) throw new Error("No card packs found");
       const whiteCardIds: string[] = [];
       const blackCardIds: string[] = [];
@@ -95,9 +101,10 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
         whiteCardsPerPlayer: cardsPerPlayer ? parseInt(cardsPerPlayer) : 10,
         whiteCardIds,
         blackCardIds,
+        currentCard: whiteCardIds.length-1
       };
 
-      setOptions(gameOptions);
+      setOptions(gameOptions, playerData);
       setisPlaying();
     } catch (e) {
       if (e instanceof z.ZodError || e instanceof Error) setError(e.message);
