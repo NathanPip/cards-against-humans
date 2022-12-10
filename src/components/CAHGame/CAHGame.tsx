@@ -1,6 +1,5 @@
 import {
   useSelf,
-  useStorage,
   useMutation as liveblocksMutation,
 } from "../../liveblocks.config";
 import PlayerDeck from "./PlayerDeck";

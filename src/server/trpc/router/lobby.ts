@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createRoom, getConnectedPlayers, getExistingRoom, setInitialRoomStorage } from "../../../utils/liveblocksUtils";
+import { createRoom, getConnectedPlayers, getExistingRoom, setInitialRoomStorage } from "../../utils/liveblocksAPIUtils";
 
 import { router, publicProcedure } from "../trpc";
 

@@ -1,6 +1,5 @@
-import type { CAHBlackCard, CAHWhiteCard } from "@prisma/client";
 import { z } from "zod";
-import { env } from "../env/server.mjs";
+import { env } from "../../env/server.mjs";
 
 type CreateRoomParams = {
   id: string;
@@ -94,14 +93,7 @@ const initialRoomStorageBodyParser = z.object({
             data: z.array(z.string()),
           }),
         }),
-        currentPlayableBlacks: z.object({
-          liveblocksType: z.literal("LiveList"),
-          data: z.array(z.string()),
-        }),
-        currentPlayableWhites: z.object({
-          liveblocksType: z.literal("LiveList"),
-          data: z.array(z.string()),
-        }),
+        
       }),
     }),
   }),

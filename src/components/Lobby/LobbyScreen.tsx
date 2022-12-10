@@ -1,5 +1,5 @@
-import { useOthersMapped, useSelf, useStorage } from "../liveblocks.config";
-import CAHGame from "./CAHGame/CAHGame";
+import { useOthersMapped, useSelf, useStorage } from "../../liveblocks.config";
+import CAHGame from "../CAHGame/CAHGame";
 import GameSelect from "./GameSelect";
 
 const LobbyScreen: React.FC = () => {
