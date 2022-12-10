@@ -116,19 +116,18 @@ export const setInitialRoomStorage = async (
       initialRoomStorageBody.data.name = initialRoomStorage.name;
       initialRoomStorageBody.data.owner = initialRoomStorage.owner;
 
-      const parsedInitialStorageBody = initialRoomStorageBodyParser.parse(initialRoomStorageBody)
-
-      await fetch(
-        `https://api.liveblocks.io/v2/rooms/${roomId}/storage`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${env.LIVEBLOCKS_SECRET_KEY}`,
-          },
-          body: JSON.stringify(parsedInitialStorageBody),
-        }
+      const parsedInitialStorageBody = initialRoomStorageBodyParser.parse(
+        initialRoomStorageBody
       );
+
+      await fetch(`https://api.liveblocks.io/v2/rooms/${roomId}/storage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${env.LIVEBLOCKS_SECRET_KEY}`,
+        },
+        body: JSON.stringify(parsedInitialStorageBody),
+      });
       resolve(true);
     } catch (error) {
       reject(error);
@@ -167,29 +166,38 @@ export const getExistingRoom = async (
 };
 
 const existingPlayersBodyParser = z.object({
-  data: z.array(z.object({
-    type: z.literal("user"),
-    connectionId: z.number(),
-    id: z.string(),
-    info: z.object({})
-  }))
-})
+  data: z.array(
+    z.object({
+      type: z.literal("user"),
+      connectionId: z.number(),
+      id: z.string().uuid(),
+      info: z.object({}).nullish(),
+    })
+  ),
+});
 
 type ExistingPlayersBody = typeof existingPlayersBodyParser._output.data;
 
-export const getConnectedPlayers = async (roomId: string): Promise<ExistingPlayersBody> => {
+export const getConnectedPlayers = async (
+  roomId: string
+): Promise<ExistingPlayersBody> => {
   return new Promise(async (resolve, reject) => {
     try {
       const response = await fetch(
         `https://api.liveblocks.io/v2/rooms/${roomId}/active_users`,
-        {}
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${env.LIVEBLOCKS_SECRET_KEY}`,
+          },
+        }
       );
       const data = await response.json();
-      const parsedData = existingPlayersBodyParser.parse(data)
+      const parsedData = existingPlayersBodyParser.parse(data);
       resolve(parsedData.data);
     } catch (error) {
       reject(error);
       console.log(error);
     }
   });
-}
+};

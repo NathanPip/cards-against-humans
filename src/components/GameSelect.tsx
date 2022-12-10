@@ -3,7 +3,7 @@ import { type inferRouterOutputs } from "@trpc/server";
 import { useContext, useRef, useState } from "react";
 import { z } from "zod";
 import { useMutation as liveblocksMutation } from "../liveblocks.config";
-import { LobbyContext } from "../pages/lobby/id";
+import { LobbyContext } from "../pages/lobby/[id]";
 import { type AppRouter } from "../server/trpc/router/_app";
 import { type CAHGameOptions } from "../types/game";
 import { trpc } from "../utils/trpc";
@@ -63,6 +63,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
     const playersList = new LiveList(parsedPlayers);
     storage.get("CAH").set("options", obj);
     storage.get("CAH").set("connectedPlayers", playersList);
+    storage.get("CAH").set("currentCard", parsedOptions.whiteCardIds.length)
     storage.get("CAH").set("currentPlayerDrawing", parsedPlayers[0]);
   }, []);
 
@@ -138,7 +139,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
       >
         {data.cardPacks.map((pack) => (
           <>
-            <label htmlFor={pack.name}>{pack.name}</label>
+            <label htmlFor={pack.name} key={pack.id+ "label"}>{pack.name}</label>
             <input
               type="checkbox"
               key={pack.id}

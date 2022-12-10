@@ -24,14 +24,17 @@ const PlayerDeck: React.FC = () => {
 
   const trpcContext = trpc.useContext();
 
-  const drawCards = liveblocksMutation(
+  const drawInitialCards = liveblocksMutation(
     async ({ storage }, nextPlayer: string | undefined, hand: string[] ) => {
       const cards = await trpcContext.game.getSelectedCards.fetch( hand );
+      storage.get("CAH").set("currentCard", currentCard-hand.length);
       setHand(cards.whiteCards);
       storage.get("CAH").set("currentPlayerDrawing", nextPlayer);
     },
     [currentPlayerDrawing, selfId]
   );
+
+  console.log(currentCard);
 
   useEffect(() => {
     if (
@@ -43,17 +46,23 @@ const PlayerDeck: React.FC = () => {
       !connectedPlayers
     )
       return;
+
+    console.log("ran")
+    console.log(currentPlayerDrawing, selfId)
     if (currentPlayerDrawing === selfId) {
+      console.log(whiteCardIds)
+      console.log(whiteCardIds.length - whiteCardsPerPlayer - 1);
       const hand = whiteCardIds.slice(
-        whiteCardIds.length - whiteCardsPerPlayer - 1,
-        whiteCardsPerPlayer
+        currentCard - whiteCardsPerPlayer - 1,
+        currentCard
       );
+      console.log(hand);
       const nextPlayer =
         connectedPlayers[connectedPlayers.length - 1] !== selfId
           ? connectedPlayers[connectedPlayers.indexOf(selfId) + 1]
           : undefined;
       updatePresence({ CAHWhiteCardIds: hand });
-      drawCards(nextPlayer, hand);
+      drawInitialCards(nextPlayer, hand);
     }
   }, [
     currentPlayerDrawing,
@@ -63,11 +72,11 @@ const PlayerDeck: React.FC = () => {
     whiteCardsPerPlayer,
     updatePresence,
     connectedPlayers,
-    drawCards,
+    drawInitialCards,
   ]);
 
   return <div>
-
+    {hand && hand.map((card) => <p key={card.id}>{card.text}</p>)}
   </div>;
 };
 
