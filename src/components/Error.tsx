@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 // import { TRPCError } from "@trpc/server";
 
@@ -19,9 +20,9 @@ const Error = () => {
         </svg>
         <h1 className="font-bold">Oops! Something went wrong.</h1>
         <p className="font-bold ">
-          <a className="italic underline" href="/lobby">
+          <Link className="italic underline" href="/">
             Click me
-          </a>{" "}
+          </Link>{" "}
           to go back while we try to resolve this issue.
         </p>
       </div>

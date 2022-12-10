@@ -6,7 +6,8 @@ import React, { useRef, useState } from "react";
 import LobbyScreen from "../../../components/LobbyScreen";
 import { type Presence, RoomProvider } from "../../../liveblocks.config";
 import { trpc } from "../../../utils/trpc";
-import Error from "../../../../src/components/error";
+import Error from "../../../../src/components/Error";
+import Loading from "../../../../src/components/Loading";
 
 const defaultPlayer: Presence = {
   name: "",
@@ -27,9 +28,9 @@ const GameRoom: NextPage = () => {
   const [name, setName] = useState<string | undefined | null>(
     session.data?.user?.name
   );
-  // return <Error />;
+  // return <Loading />;
 
-  if (!id || Array.isArray(id) || lobby.isLoading) return <>loading</>;
+  if (!id || Array.isArray(id) || lobby.isLoading) return <Loading />;
 
   if (lobby.error || lobby.isLoadingError) return <Error />;
 
@@ -46,7 +47,7 @@ const GameRoom: NextPage = () => {
             isHost: lobby.data.userId === session.data?.user?.id,
           }}
         >
-          <ClientSideSuspense fallback={<div>Loading...</div>}>
+          <ClientSideSuspense fallback={<Loading />}>
             {() => <LobbyScreen lobby={lobby.data} />}
           </ClientSideSuspense>
         </RoomProvider>
