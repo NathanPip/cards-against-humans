@@ -34,7 +34,7 @@ const GameRoom: NextPage = () => {
 
   if (lobby.error || lobby.isLoadingError) return <Error />;
 
-  if (!lobby.data?.id) return <Error />;
+  if (!lobby.data?.id) return <Error message="Not Found" />;
 
   return (
     <>
@@ -47,7 +47,7 @@ const GameRoom: NextPage = () => {
             isHost: lobby.data.userId === session.data?.user?.id,
           }}
         >
-          <ClientSideSuspense fallback={<div>Loading...</div>}>
+          <ClientSideSuspense fallback={<Loading />}>
             {() => <LobbyScreen />}
           </ClientSideSuspense>
         </RoomProvider>
