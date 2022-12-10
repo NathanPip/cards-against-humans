@@ -12,7 +12,7 @@ type GameProps = {
   name: "Cards Against Humanity";
 };
 
-const Game: React.FC<GameProps> = ({ name }) => {
+const GameSelect: React.FC<GameProps> = ({ name }) => {
   const gameInfo = trpc.game.getBasicGameInfo.useQuery({ name });
 
   if (gameInfo.isLoading) return <Loading />;
@@ -143,4 +143,4 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   );
 };
 
-export default Game;
+export default GameSelect;

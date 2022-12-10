@@ -47,8 +47,8 @@ const GameRoom: NextPage = () => {
             isHost: lobby.data.userId === session.data?.user?.id,
           }}
         >
-          <ClientSideSuspense fallback={<Loading />}>
-            {() => <LobbyScreen lobby={lobby.data} />}
+          <ClientSideSuspense fallback={<div>Loading...</div>}>
+            {() => <LobbyScreen />}
           </ClientSideSuspense>
         </RoomProvider>
       ) : (
