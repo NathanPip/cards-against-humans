@@ -6,7 +6,7 @@ export const gameRouter = router({
   getBasicGameInfo: publicProcedure
     .input(z.object({ name: z.string() }))
     .query(async ({ input, ctx }) => {
-      console.log(input.name)
+      console.log(input.name);
       if (input.name === "Cards Against Humanity") {
         const cardPacks = await ctx.prisma.cAHPack.findMany({
           include: {
@@ -23,7 +23,7 @@ export const gameRouter = router({
   getSelectedCardPacks: publicProcedure
     .input(z.array(z.string()).nullish())
     .query(async ({ input, ctx }) => {
-      if(!input) return null;
+      if (!input) return null;
       const cardPacks = await ctx.prisma.cAHPack.findMany({
         where: {
           id: {
@@ -31,10 +31,47 @@ export const gameRouter = router({
           },
         },
         include: {
-          blackCards: true,
-          whiteCards: true,
+          blackCards: {
+            select: {
+              id: true,
+            },
+          },
+          whiteCards: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
       return { cardPacks };
+    }),
+  getSelectedCards: publicProcedure
+    .input(z.array(z.string()))
+    .query(async ({ input, ctx }) => {
+      const whiteCards = await ctx.prisma.cAHWhiteCard.findMany({
+        where: {
+          id: {
+            in: input,
+          },
+        },
+        select: {
+          text: true,
+          type: true,
+          id: true
+        },
+      });
+      const blackCards = await ctx.prisma.cAHBlackCard.findMany({
+        where: {
+          id: {
+            in: input,
+          },
+        },
+        select: {
+          text: true,
+          type: true,
+          id: true
+        },
+      });
+      return { whiteCards, blackCards };
     }),
 });

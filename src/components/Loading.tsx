@@ -1,6 +1,4 @@
-import React from "react";
-
-const Loading = () => {
+const Loading: React.FC = () => {
   return (
     <div className="bg-grey flex h-screen items-center justify-center">
       <div className="rounded-full bg-white p-4">

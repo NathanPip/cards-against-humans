@@ -1,9 +1,4 @@
-import { LiveObject, type LiveList } from "@liveblocks/client"
-
-export type CAHGame = {
-    whites: string[],
-    blacks: string[]
-}
+import { type LiveObject, type LiveList } from "@liveblocks/client"
 
 export type CAHGameOptions = LiveObject<{
     pointsToWin: number

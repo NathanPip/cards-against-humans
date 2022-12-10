@@ -1,24 +1,24 @@
 import { ClientSideSuspense } from "@liveblocks/react";
+import { type Lobby } from "@prisma/client";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React, { useRef, useState } from "react";
-import LobbyScreen from "../../../components/LobbyScreen";
-import { type Presence, RoomProvider } from "../../../liveblocks.config";
-import { trpc } from "../../../utils/trpc";
-import Error from "../../../../src/components/Error";
-import Loading from "../../../../src/components/Loading";
+import React, { createContext, useRef, useState } from "react";
+import LobbyScreen from "../../components/Lobby/LobbyScreen";
+import { type Presence, RoomProvider } from "../../liveblocks.config";
+import { trpc } from "../../utils/trpc";
 
 const defaultPlayer: Presence = {
   name: "",
   score: 0,
   isHost: false,
-  CAH: {
-    whites: [],
-    blacks: [],
-    turn: false,
-  },
+  currentAction: "waiting",
+  CAHWhiteCardIds: [],
+  CAHBlackCardIds: [],
+  CAHturn: false,
 };
+
+export const LobbyContext = createContext<null | Lobby>(null);
 
 const GameRoom: NextPage = () => {
   const router = useRouter();
@@ -28,13 +28,12 @@ const GameRoom: NextPage = () => {
   const [name, setName] = useState<string | undefined | null>(
     session.data?.user?.name
   );
-  // return <Loading />;
 
-  if (!id || Array.isArray(id) || lobby.isLoading) return <Loading />;
+  if (!id || Array.isArray(id) || lobby.isLoading) return <>loading</>;
 
-  if (lobby.error || lobby.isLoadingError) return <Error />;
+  if (lobby.error || lobby.isLoadingError) return <>error</>;
 
-  if (!lobby.data?.id) return <Error message="Not Found" />;
+  if (!lobby.data?.id) return <>None Found</>;
 
   return (
     <>
@@ -47,8 +46,12 @@ const GameRoom: NextPage = () => {
             isHost: lobby.data.userId === session.data?.user?.id,
           }}
         >
-          <ClientSideSuspense fallback={<Loading />}>
-            {() => <LobbyScreen />}
+          <ClientSideSuspense fallback={<div>Loading...</div>}>
+            {() => (
+              <LobbyContext.Provider value={lobby.data}>
+                <LobbyScreen />
+              </LobbyContext.Provider>
+            )}
           </ClientSideSuspense>
         </RoomProvider>
       ) : (

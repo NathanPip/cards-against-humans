@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createRoom, getExistingRoom, setInitialRoomStorage } from "../../../utils/liveblocksUtils";
+import { createRoom, getConnectedPlayers, getExistingRoom, setInitialRoomStorage } from "../../utils/liveblocksAPIUtils";
 
 import { router, publicProcedure } from "../trpc";
 
@@ -35,4 +35,9 @@ export const lobbyRouter = router({
       const room = await getExistingRoom(input);
       return room;
     }),
+  getConnectedPlayers: publicProcedure.input(z.string()).query(async ({ input }) => {
+    if(!input) throw new TRPCError({ code: "BAD_REQUEST", message: "No room id provided" });
+    const players = await getConnectedPlayers(input);
+    return players;
+  })
 });

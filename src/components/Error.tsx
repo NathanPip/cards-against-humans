@@ -1,6 +1,4 @@
 import Link from "next/link";
-import React from "react";
-// import { TRPCError } from "@trpc/server";
 
 type Props = {
   message?: "Not Found" | "Internal Server Error" | "Not Authorized";
