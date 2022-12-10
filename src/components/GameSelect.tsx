@@ -7,6 +7,7 @@ import { LobbyContext } from "../pages/lobby/id";
 import { type AppRouter } from "../server/trpc/router/_app";
 import { type CAHGameOptions } from "../types/game";
 import { trpc } from "../utils/trpc";
+import Loading from "./Loading";
 
 type GameProps = {
   name: "Cards Against Humanity";
@@ -15,7 +16,7 @@ type GameProps = {
 const GameSelect: React.FC<GameProps> = ({ name }) => {
   const gameInfo = trpc.game.getBasicGameInfo.useQuery({ name });
 
-  if (gameInfo.isLoading) return <div>Loading...</div>;
+  if (gameInfo.isLoading) return <Loading />;
 
   if (gameInfo.isError || !gameInfo.data) return <div>Error</div>;
 
@@ -66,7 +67,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   }, []);
 
   const setisPlaying = liveblocksMutation(({ storage }) => {
-      storage.set("currentGame", "Cards Against Humanity");
+    storage.set("currentGame", "Cards Against Humanity");
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
