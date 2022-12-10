@@ -58,46 +58,17 @@ const initialRoomStorageBody = {
         options: {
           pointsToWin: 10,
           whiteCardsPerPlayer: 10,
-          cardPacks: {
-            liveblocksType: "LiveList",
-            data: [],
-          },
         },
-        currentPlayableBlacks: {
-          liveblocksType: "LiveList",
-          data: [],
-        },
-        currentPlayableWhites: {
-          liveblocksType: "LiveList",
-          data: [],
-        },
+        whiteCardIds: [],
+        blackCardIds: [],
+        connectedPlayers: [],
+        currentPlayerDrawing: undefined,
+        currentCard: undefined,
+        activeState: "ending game",
       },
     },
   },
 };
-
-const initialRoomStorageBodyParser = z.object({
-  liveblocksType: z.literal("LiveObject"),
-  data: z.object({
-    name: z.string(),
-    owner: z.string().cuid(),
-    currentGame: z.literal("Cards Against Humanity").nullish(),
-    CAH: z.object({
-      liveblocksType: z.literal("LiveObject"),
-      data: z.object({
-        options: z.object({
-          pointsToWin: z.number().min(1).max(100),
-          whiteCardsPerPlayer: z.number().min(1).max(25),
-          cardPacks: z.object({
-            liveblocksType: z.literal("LiveList"),
-            data: z.array(z.string()),
-          }),
-        }),
-        
-      }),
-    }),
-  }),
-});
 
 export const setInitialRoomStorage = async (
   roomId: string,
@@ -108,17 +79,13 @@ export const setInitialRoomStorage = async (
       initialRoomStorageBody.data.name = initialRoomStorage.name;
       initialRoomStorageBody.data.owner = initialRoomStorage.owner;
 
-      const parsedInitialStorageBody = initialRoomStorageBodyParser.parse(
-        initialRoomStorageBody
-      );
-
       await fetch(`https://api.liveblocks.io/v2/rooms/${roomId}/storage`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${env.LIVEBLOCKS_SECRET_KEY}`,
         },
-        body: JSON.stringify(parsedInitialStorageBody),
+        body: JSON.stringify(initialRoomStorage),
       });
       resolve(true);
     } catch (error) {

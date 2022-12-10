@@ -38,12 +38,14 @@ type CAHOptionsProps = {
       const obj: CAHGameOptions = new LiveObject({
         pointsToWin: parsedOptions.pointsToWin,
         whiteCardsPerPlayer: parsedOptions.whiteCardsPerPlayer,
-        whiteCardIds: new LiveList(parsedOptions.whiteCardIds),
-        blackCardIds: new LiveList(parsedOptions.blackCardIds),
       });
+      const whiteCardIds = new LiveList(parsedOptions.whiteCardIds)
+      const blackCardIds = new LiveList(parsedOptions.blackCardIds)
       const parsedPlayers = ConnectedPlayersParser.parse(players);
       const playersList = new LiveList(parsedPlayers);
       storage.get("CAH").set("options", obj);
+      storage.get("CAH").set("whiteCardIds", whiteCardIds);
+      storage.get("CAH").set("blackCardIds", blackCardIds);
       storage.get("CAH").set("connectedPlayers", playersList);
       storage.get("CAH").set("currentCard", parsedOptions.whiteCardIds.length)
       storage.get("CAH").set("currentPlayerDrawing", parsedPlayers[0]);

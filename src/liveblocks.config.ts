@@ -1,4 +1,8 @@
-import { createClient, type LiveList, type LiveObject } from "@liveblocks/client";
+import {
+  createClient,
+  type LiveList,
+  type LiveObject,
+} from "@liveblocks/client";
 import { createRoomContext } from "@liveblocks/react";
 import { type CAHGameOptions } from "./types/game";
 
@@ -21,13 +25,30 @@ export type Storage = {
   owner: string;
   currentGame: null | "Cards Against Humanity";
   CAH: LiveObject<{
-    options: CAHGameOptions
+    options: CAHGameOptions;
+    whiteCardIds: LiveList<string>;
+    blackCardIds: LiveList<string>;
     connectedPlayers: LiveList<string>;
-    currentPlayerDrawing: string | undefined,
-    currentCard: number
+    currentPlayerDrawing: string | undefined;
+    currentCard: number | undefined;
+    activeState:
+      | "dealing whites"
+      | "dealing blacks"
+      | "waiting for players"
+      | "waiting for judge"
+      | "starting game"
+      | "ending game";
   }>;
 };
 
 export const {
-  suspense: { RoomProvider, useMyPresence, useSelf, useOthersMapped, useStorage, useMutation, useUpdateMyPresence },
+  suspense: {
+    RoomProvider,
+    useMyPresence,
+    useSelf,
+    useOthersMapped,
+    useStorage,
+    useMutation,
+    useUpdateMyPresence,
+  },
 } = createRoomContext<Presence, Storage>(client);

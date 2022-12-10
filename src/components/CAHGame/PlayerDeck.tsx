@@ -13,7 +13,7 @@ const PlayerDeck: React.FC = () => {
     (root) => root.CAH.currentPlayerDrawing
   );
   const connectedPlayers = useStorage((root) => root.CAH.connectedPlayers);
-  const whiteCardIds = useStorage((root) => root.CAH.options.whiteCardIds);
+  const whiteCardIds = useStorage((root) => root.CAH.whiteCardIds);
   const currentCard = useStorage((root) => root.CAH.currentCard);
   const whiteCardsPerPlayer = useStorage(
     (root) => root.CAH.options.whiteCardsPerPlayer
@@ -26,6 +26,7 @@ const PlayerDeck: React.FC = () => {
 
   const drawInitialCards = liveblocksMutation(
     async ({ storage }, nextPlayer: string | undefined, hand: string[] ) => {
+      if(!currentCard) throw new Error("No current card")
       const cards = await trpcContext.game.getSelectedCards.fetch( hand );
       storage.get("CAH").set("currentCard", currentCard-hand.length);
       setHand(cards.whiteCards);
@@ -47,16 +48,12 @@ const PlayerDeck: React.FC = () => {
     )
       return;
 
-    console.log("ran")
-    console.log(currentPlayerDrawing, selfId)
     if (currentPlayerDrawing === selfId) {
-      console.log(whiteCardIds)
-      console.log(whiteCardIds.length - whiteCardsPerPlayer - 1);
+      updatePresence({ currentAction: "drawing"})
       const hand = whiteCardIds.slice(
         currentCard - whiteCardsPerPlayer - 1,
         currentCard
       );
-      console.log(hand);
       const nextPlayer =
         connectedPlayers[connectedPlayers.length - 1] !== selfId
           ? connectedPlayers[connectedPlayers.indexOf(selfId) + 1]
@@ -64,6 +61,7 @@ const PlayerDeck: React.FC = () => {
       updatePresence({ CAHWhiteCardIds: hand });
       drawInitialCards(nextPlayer, hand);
     }
+    updatePresence({ currentAction: "waiting"})
   }, [
     currentPlayerDrawing,
     selfId,
