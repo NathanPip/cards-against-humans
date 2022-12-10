@@ -31,6 +31,7 @@ export type Storage = {
     connectedPlayers: LiveList<string>;
     currentPlayerDrawing: string | undefined;
     currentCard: number | undefined;
+    currentBlackCard: number | undefined;
     activeState:
       | "dealing whites"
       | "dealing blacks"
@@ -38,6 +39,7 @@ export type Storage = {
       | "waiting for judge"
       | "starting game"
       | "ending game";
+    currentPlayerTurn: string | undefined;
   }>;
 };
 
@@ -50,5 +52,7 @@ export const {
     useStorage,
     useMutation,
     useUpdateMyPresence,
+    useBroadcastEvent,
+    useEventListener
   },
 } = createRoomContext<Presence, Storage>(client);

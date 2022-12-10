@@ -2,6 +2,7 @@ import {
   useSelf,
   useMutation as liveblocksMutation,
 } from "../../liveblocks.config";
+import GameArea from "./GameArea";
 import PlayerDeck from "./PlayerDeck";
 
 const CAHGame: React.FC = () => {
@@ -14,6 +15,7 @@ const CAHGame: React.FC = () => {
   return (
     <>
       {isHost && <button onClick={endGame}>exit</button>}
+      <GameArea />
       <PlayerDeck />
     </>
   );

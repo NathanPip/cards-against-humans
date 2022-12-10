@@ -12,16 +12,16 @@ type CAHOptionsProps = {
     data: inferRouterOutputs<AppRouter>["game"]["getBasicGameInfo"];
   };
   
-  const FormOptionsInputsParser = z.object({
+const FormOptionsInputsParser = z.object({
     pointsToWin: z.number().min(1).max(100),
     whiteCardsPerPlayer: z.number().min(1).max(25),
     whiteCardIds: z.array(z.string().cuid()),
     blackCardIds: z.array(z.string().cuid()),
-  });
+});
   
-  const ConnectedPlayersParser = z.array(z.string()).nonempty()
+const ConnectedPlayersParser = z.array(z.string()).nonempty()
   
-  const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
+const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
     const pointsToWinInput = useRef<HTMLInputElement>(null);
     const cardsPerPlayerInput = useRef<HTMLInputElement>(null);
     const cardPacksSelect = useRef<HTMLFieldSetElement>(null);
@@ -48,7 +48,10 @@ type CAHOptionsProps = {
       storage.get("CAH").set("blackCardIds", blackCardIds);
       storage.get("CAH").set("connectedPlayers", playersList);
       storage.get("CAH").set("currentCard", parsedOptions.whiteCardIds.length)
+      storage.get("CAH").set("currentBlackCard", parsedOptions.blackCardIds.length-1)
       storage.get("CAH").set("currentPlayerDrawing", parsedPlayers[0]);
+      storage.get("CAH").set("currentPlayerTurn", parsedPlayers[Math.floor(Math.random() * parsedPlayers.length)]);
+      storage.get("CAH").set("activeState", "starting game");
     }, []);
   
     const setisPlaying = liveblocksMutation(({ storage }) => {
