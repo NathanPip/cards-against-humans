@@ -14,7 +14,7 @@ const PlayerDeck: React.FC = () => {
     (root) => root.CAH.currentPlayerDrawing
   );
   const connectedPlayers = useStorage((root) => root.CAH.connectedPlayers);
-  const whiteCardIds = useStorage((root) => root.CAH.whiteCardIds);
+  const whiteCards = useStorage((root) => root.CAH.whiteCards);
   const currentCard = useStorage((root) => root.CAH.currentCard);
   const whiteCardsPerPlayer = useStorage(
     (root) => root.CAH.options.whiteCardsPerPlayer
@@ -28,16 +28,12 @@ const PlayerDeck: React.FC = () => {
   const isHost = useSelf((me) => me.presence.isHost);
 
   const [hand, setHand] =
-    useState<{ text: string; type: string; id: string }[]>();
-
-  const trpcContext = trpc.useContext();
+    useState<{ text: string; id: string }[]>();
 
   const drawInitialCards = liveblocksMutation(
     async ({ storage }, nextPlayer: string | undefined, hand: string[]) => {
       if (!currentCard) throw new Error("No current card");
-      const cards = await trpcContext.game.getSelectedCards.fetch(hand);
       storage.get("CAH").set("currentCard", currentCard - hand.length);
-      setHand(cards.whiteCards);
       storage.get("CAH").set("currentPlayerDrawing", nextPlayer);
     },
     [currentPlayerDrawing, selfId]
@@ -48,14 +44,14 @@ const PlayerDeck: React.FC = () => {
   }, []);
 
   const dealBlacks = liveblocksMutation(async ({ storage }) => {
-    storage.get("CAH").set("activeState", "dealing blacks");
+    storage.get("CAH").set("activeState", "waiting for players");
   }, [])
 
   // Initial Draw
   useEffect(() => {
     if (
       !selfId ||
-      !whiteCardIds ||
+      !whiteCards ||
       !currentCard ||
       !whiteCardsPerPlayer ||
       !connectedPlayers
@@ -65,7 +61,7 @@ const PlayerDeck: React.FC = () => {
     if (activeState === "dealing whites") {
       if (currentPlayerDrawing === selfId) {
         updatePresence({ currentAction: "drawing" });
-        const hand = whiteCardIds.slice(
+        const hand = whiteCards.slice(
           currentCard - whiteCardsPerPlayer - 1,
           currentCard
         );
@@ -74,8 +70,9 @@ const PlayerDeck: React.FC = () => {
             ? connectedPlayers[connectedPlayers.indexOf(selfId) + 1]
             : "";
         console.log("next player",nextPlayer);
-        updatePresence({ CAHWhiteCardIds: hand });
-        drawInitialCards(nextPlayer, hand);
+        updatePresence({ CAHWhiteCardIds: hand.map(card => card.id) });
+        drawInitialCards(nextPlayer, hand.map(card => card.id));
+        setHand(hand);
       }
       console.log("current player drawing " + currentPlayerDrawing)
       if (isHost && currentPlayerDrawing === "") {
@@ -87,7 +84,7 @@ const PlayerDeck: React.FC = () => {
   }, [
     currentPlayerDrawing,
     selfId,
-    whiteCardIds,
+    whiteCards,
     currentCard,
     whiteCardsPerPlayer,
     updatePresence,

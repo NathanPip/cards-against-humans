@@ -26,15 +26,14 @@ export type Storage = {
   currentGame: null | "Cards Against Humanity";
   CAH: LiveObject<{
     options: CAHGameOptions;
-    whiteCardIds: LiveList<string>;
-    blackCardIds: LiveList<string>;
+    whiteCards: LiveList<{id: string, text: string}>;
+    blackCards: LiveList<{id: string, text: string}>;
     connectedPlayers: LiveList<string>;
     currentPlayerDrawing: string | undefined;
     currentCard: number | undefined;
     currentBlackCard: number | undefined;
     activeState:
-      | "dealing whites"
-      | "dealing blacks"
+      "dealing whites"
       | "waiting for players"
       | "waiting for judge"
       | "starting game"
