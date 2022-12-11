@@ -7,6 +7,7 @@ import {
   useUpdateMyPresence,
   useBroadcastEvent
 } from "../../liveblocks.config";
+import WhiteCard from "./WhiteCard";
 
 const PlayerDeck: React.FC = () => {
   const updatePresence = useUpdateMyPresence();
@@ -15,7 +16,7 @@ const PlayerDeck: React.FC = () => {
   );
   const connectedPlayers = useStorage((root) => root.CAH.connectedPlayers);
   const whiteCards = useStorage((root) => root.CAH.whiteCards);
-  const currentCard = useStorage((root) => root.CAH.currentCard);
+  const currentCard = useStorage((root) => root.CAH.currentWhiteCard);
   const whiteCardsPerPlayer = useStorage(
     (root) => root.CAH.options.whiteCardsPerPlayer
   );
@@ -27,15 +28,13 @@ const PlayerDeck: React.FC = () => {
   const activeState = useStorage((root) => root.CAH.activeState);
 
   const isHost = useSelf((me) => me.presence.isHost);
-  const isTurn = useSelf((me) => me.presence.CAHturn);
-  const actionState = useSelf((me) => me.presence.currentAction);
 
   const [hand, setHand] = useState<{ text: string; id: string }[]>();
 
   const drawInitialCards = liveblocksMutation(
     async ({ storage }, nextPlayer: string | undefined, hand: string[]) => {
       if (!currentCard) throw new Error("No current card");
-      storage.get("CAH").set("currentCard", currentCard - hand.length);
+      storage.get("CAH").set("currentWhiteCard", currentCard - hand.length);
       storage.get("CAH").set("currentPlayerDrawing", nextPlayer);
     },
     [currentPlayerDrawing, selfId]
@@ -50,28 +49,7 @@ const PlayerDeck: React.FC = () => {
     setMyPresence({ currentAction: "selecting" });
   }, []);
 
-  const selectCard = liveblocksMutation( async ({ storage, setMyPresence }, card: {id: string, text: string}) => {
-    const cardsInRound = storage.get("CAH").get("cardsInRound") || [];
-    
-    storage.get("CAH").set("cardsInRound", new LiveList([...cardsInRound, card]));
-
-    setMyPresence({currentAction: "drawing"});
-  }, [])
-
-  const cardClickHandler = (e: MouseEvent<HTMLParagraphElement>) => {
-    console.log("clicked")
-    if(!e.target || !hand) return; //Error
-    const cardEl = e.target as HTMLElement;
-    const id = cardEl.dataset.id;
-    if(!id) return; //Error
-    const card = hand.find((card) => card.id === id);
-    if(!card) return; //Error
-    setHand(prev => prev?.filter(prev => prev !== card))
-    selectCard(card);
-    console.log("completed")
-  }
-
-  // Initial Draw
+  // Initial Draw BE CAREFUL
   useEffect(() => {
     if (
       !selfId ||
@@ -120,30 +98,19 @@ const PlayerDeck: React.FC = () => {
     activeState,
     startGame,
     dealWhites,
+    broadcast
   ]);
 
   useEffect(() => {
     if(!hand) return;
       updatePresence({ CAHWhiteCardIds: hand.map((card) => card.id) });
   }, [hand, updatePresence])
-  console.log(actionState)
+
   return (
     <div>
       {hand &&
         hand.map((card) => (
-          <p
-            key={card.id}
-            data-id={card.id}
-            onClick={(e) =>
-              !isTurn &&
-              actionState === "selecting" &&
-              activeState === "waiting for players"
-                ? cardClickHandler(e)
-                : null
-            }
-          >
-            {card.text}
-          </p>
+          <WhiteCard card={card} setHand={setHand} key={card.id}/>
         ))}
     </div>
   );

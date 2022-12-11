@@ -29,18 +29,18 @@ export type Storage = {
     options: CAHGameOptions;
     whiteCards: LiveList<{id: string, text: string}>;
     blackCards: LiveList<{id: string, text: string}>;
+    cardsInRound: LiveList<Pick<CAHWhiteCard, "id" | "text"> & {playerId: string}> | undefined;
+    currentWhiteCard: number | undefined;
+    currentBlackCard: number | undefined;
     connectedPlayers: LiveList<string>;
     currentPlayerDrawing: string | undefined;
-    currentCard: number | undefined;
-    currentBlackCard: number | undefined;
+    currentPlayerTurn: string | undefined;
     activeState:
       "dealing whites"
       | "waiting for players"
       | "waiting for judge"
       | "starting game"
       | "ending game";
-    currentPlayerTurn: string | undefined;
-    cardsInRound: LiveList<Pick<CAHWhiteCard, "id" | "text">> | undefined;
   }>;
 };
 
