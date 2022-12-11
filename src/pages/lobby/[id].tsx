@@ -4,6 +4,8 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { createContext, useRef, useState } from "react";
+import Error from "../../components/Error";
+import Loading from "../../components/Loading";
 import LobbyScreen from "../../components/Lobby/LobbyScreen";
 import { type Presence, RoomProvider } from "../../liveblocks.config";
 import { trpc } from "../../utils/trpc";
@@ -29,11 +31,11 @@ const GameRoom: NextPage = () => {
     session.data?.user?.name
   );
 
-  if (!id || Array.isArray(id) || lobby.isLoading) return <>loading</>;
+  if (!id || Array.isArray(id) || lobby.isLoading) return <Loading />;
 
-  if (lobby.error || lobby.isLoadingError) return <>error</>;
+  if (lobby.error || lobby.isLoadingError) return <Error />;
 
-  if (!lobby.data?.id) return <>None Found</>;
+  if (!lobby.data?.id) return <Error message="Not Found" />;
 
   return (
     <>
@@ -46,7 +48,7 @@ const GameRoom: NextPage = () => {
             isHost: lobby.data.userId === session.data?.user?.id,
           }}
         >
-          <ClientSideSuspense fallback={<div>Loading...</div>}>
+          <ClientSideSuspense fallback={<Loading />}>
             {() => (
               <LobbyContext.Provider value={lobby.data}>
                 <LobbyScreen />
