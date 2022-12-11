@@ -26,21 +26,11 @@ const GameArea: React.FC = () => {
 
     console.log(activeState);
 
-    const fetchBlackCard = useCallback(async () => {
-        if(!currentBlackCardIndex || !blackCards || !blackCards[currentBlackCardIndex]) return;
-        try{
-            const blackCard = blackCards[currentBlackCardIndex];
-            setCurrentBlackCard(blackCard);
-        } catch(e) {
-            if(e instanceof Error) console.log(e.message)
+    useEffect(() => {
+        if(currentBlackCardIndex && blackCards) {
+            setCurrentBlackCard(blackCards[currentBlackCardIndex]);
         }
     }, [currentBlackCardIndex, blackCards])
-
-    useEffect(() => {
-        if(currentBlackCardIndex) {
-            fetchBlackCard();
-        }
-    }, [currentBlackCardIndex, fetchBlackCard])
 
     useEffect(() => {
         if(currentBlackCard && currentPlayerTurn === id) {
