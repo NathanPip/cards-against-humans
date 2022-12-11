@@ -4,6 +4,7 @@ import {
   type LiveObject,
 } from "@liveblocks/client";
 import { createRoomContext } from "@liveblocks/react";
+import { type CAHWhiteCard } from "@prisma/client";
 import { type CAHGameOptions } from "./types/game";
 
 const client = createClient({
@@ -14,7 +15,7 @@ export type Presence = {
   name: string;
   score?: number;
   isHost?: boolean;
-  currentAction: string;
+  currentAction: "waiting" | "drawing" | "judging" | "selecting";
   CAHWhiteCardIds?: string[];
   CAHBlackCardIds?: string[];
   CAHturn?: boolean;
@@ -39,6 +40,7 @@ export type Storage = {
       | "starting game"
       | "ending game";
     currentPlayerTurn: string | undefined;
+    cardsInRound: LiveList<Pick<CAHWhiteCard, "id" | "text">> | undefined;
   }>;
 };
 

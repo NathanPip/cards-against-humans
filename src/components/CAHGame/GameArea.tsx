@@ -2,6 +2,7 @@ import { type CAHBlackCard } from "@prisma/client";
 import { useCallback, useEffect, useState } from "react";
 import { useOthersMapped, useSelf, useStorage, useMutation as liveblocksMutation, useUpdateMyPresence } from "../../liveblocks.config";
 import { trpc } from "../../utils/trpc";
+import CardsInRound from "./CardsInRound";
 
 type BlackCardData = Pick<CAHBlackCard, "id" | "text" >;
 
@@ -43,6 +44,7 @@ const GameArea: React.FC = () => {
     return (
     <div>
         {currentBlackCard && <div>{currentBlackCard.text}</div>}
+        <CardsInRound />
     </div>
     )
 }
