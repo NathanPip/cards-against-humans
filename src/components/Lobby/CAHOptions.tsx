@@ -10,33 +10,34 @@ import { type CAHGameOptions } from "../../types/game";
 import { trpc } from "../../utils/trpc";
 
 type CAHOptionsProps = {
-    data: inferRouterOutputs<AppRouter>["game"]["getBasicGameInfo"];
-  };
+  data: inferRouterOutputs<AppRouter>["game"]["getBasicGameInfo"];
+};
 
 const CardDataType = z.object({
   id: z.string().cuid(),
   text: z.string(),
-})
-  
-const FormOptionsInputsParser = z.object({
-    pointsToWin: z.number().min(1).max(100),
-    whiteCardsPerPlayer: z.number().min(1).max(25),
-    whiteCards: z.array(CardDataType),
-    blackCards: z.array(CardDataType),
 });
-  
-const ConnectedPlayersParser = z.array(z.string()).nonempty()
-  
+
+const FormOptionsInputsParser = z.object({
+  pointsToWin: z.number().min(1).max(100),
+  whiteCardsPerPlayer: z.number().min(1).max(25),
+  whiteCards: z.array(CardDataType),
+  blackCards: z.array(CardDataType),
+});
+
+const ConnectedPlayersParser = z.array(z.string()).nonempty();
+
 const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
-    const pointsToWinInput = useRef<HTMLInputElement>(null);
-    const cardsPerPlayerInput = useRef<HTMLInputElement>(null);
-    const cardPacksSelect = useRef<HTMLFieldSetElement>(null);
-    const trpcContext = trpc.useContext();
-    const lobby = useContext(LobbyContext);
-  
-    const [error, setError] = useState<string | null>(null);
-  
-    const setOptions = liveblocksMutation(({ storage }, options, players: string[]) => {
+  const pointsToWinInput = useRef<HTMLInputElement>(null);
+  const cardsPerPlayerInput = useRef<HTMLInputElement>(null);
+  const cardPacksSelect = useRef<HTMLFieldSetElement>(null);
+  const trpcContext = trpc.useContext();
+  const lobby = useContext(LobbyContext);
+
+  const [error, setError] = useState<string | null>(null);
+
+  const setOptions = liveblocksMutation(
+    ({ storage }, options, players: string[]) => {
       ///////////////////////////
       //ERROR NEEDS TO BE SET WITH TRY CATCH
       ///////////////////////////
@@ -45,115 +46,153 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
         pointsToWin: parsedOptions.pointsToWin,
         whiteCardsPerPlayer: parsedOptions.whiteCardsPerPlayer,
       });
-      const whiteCards = new LiveList(parsedOptions.whiteCards)
-      const blackCards = new LiveList(parsedOptions.blackCards)
+      const whiteCards = new LiveList(parsedOptions.whiteCards);
+      const blackCards = new LiveList(parsedOptions.blackCards);
       const parsedPlayers = ConnectedPlayersParser.parse(players);
       const playersList = new LiveList(parsedPlayers);
-      console.log(storage.get("CAH"))
+      console.log(storage.get("CAH"));
       storage.get("CAH").set("options", obj);
       storage.get("CAH").set("whiteCards", whiteCards);
       storage.get("CAH").set("blackCards", blackCards);
       storage.get("CAH").set("connectedPlayers", playersList);
-      storage.get("CAH").set("currentWhiteCard", parsedOptions.whiteCards.length)
-      storage.get("CAH").set("currentBlackCard", parsedOptions.blackCards.length-1)
+      storage
+        .get("CAH")
+        .set("currentWhiteCard", parsedOptions.whiteCards.length);
+      storage
+        .get("CAH")
+        .set("currentBlackCard", parsedOptions.blackCards.length - 1);
       storage.get("CAH").set("currentPlayerDrawing", parsedPlayers[0]);
-      storage.get("CAH").set("currentPlayerTurn", parsedPlayers[Math.floor(Math.random() * parsedPlayers.length)]);
-      storage.get("CAH").set("activeState", "starting game");
-    }, []);
-  
-    const setisPlaying = liveblocksMutation(({ storage }) => {
-      storage.set("currentGame", "Cards Against Humanity");
-    }, []);
-  
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      try {
-        const pointsToWin = pointsToWinInput.current?.value;
-        const cardsPerPlayer = cardsPerPlayerInput.current?.value;
-        const cardPacksElements = cardPacksSelect.current;
-        if (!cardPacksElements) return;
-        if(!lobby) throw new Error("No lobby found");
-  
-        const cardPacks = Array.from(cardPacksElements.elements)
-          .map((e) => e as HTMLInputElement)
-          .filter((e: HTMLInputElement) => e.checked)
-          .map((e: HTMLInputElement) => e.value);
-  
-        ///////////////////////////
-      //ERROR NEEDS TO BE SET WITH TRY CATCH
-      ///////////////////////////
-        const packData = await trpcContext.game.getSelectedCardPacks.fetch(
-          cardPacks
+      storage
+        .get("CAH")
+        .set(
+          "currentPlayerTurn",
+          parsedPlayers[Math.floor(Math.random() * parsedPlayers.length)]
         );
-        ///////////////////////////
+      storage.get("CAH").set("activeState", "starting game");
+    },
+    []
+  );
+
+  const setisPlaying = liveblocksMutation(({ storage }) => {
+    storage.set("currentGame", "Cards Against Humanity");
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const pointsToWin = pointsToWinInput.current?.value;
+      const cardsPerPlayer = cardsPerPlayerInput.current?.value;
+      const cardPacksElements = cardPacksSelect.current;
+      if (!cardPacksElements) return;
+      if (!lobby) throw new Error("No lobby found");
+
+      const cardPacks = Array.from(cardPacksElements.elements)
+        .map((e) => e as HTMLInputElement)
+        .filter((e: HTMLInputElement) => e.checked)
+        .map((e: HTMLInputElement) => e.value);
+
+      ///////////////////////////
       //ERROR NEEDS TO BE SET WITH TRY CATCH
       ///////////////////////////
-        const playerData = (await trpcContext.lobby.getConnectedPlayers.fetch(lobby.id)).map((player) => player.id);
-        if (!packData) throw new Error("No card packs found");
-        const whiteCards: z.infer<typeof CardDataType>[] = [];
-        const blackCards: z.infer<typeof CardDataType>[] = [];
-        packData.cardPacks.forEach((pack) => {
-          whiteCards.push(...pack.whiteCards);
-          blackCards.push(...pack.blackCards);
-        });
-        whiteCards.sort(() => Math.random() - 0.5);
-        blackCards.sort(() => Math.random() - 0.5);
-        const gameOptions = {
-          pointsToWin: pointsToWin ? parseInt(pointsToWin) : 10,
-          whiteCardsPerPlayer: cardsPerPlayer ? parseInt(cardsPerPlayer) : 10,
-          whiteCards,
-          blackCards,
-          currentCard: whiteCards.length-1
-        };
-  
-        setOptions(gameOptions, playerData);
-        setisPlaying();
-        console.log("ran");
-      } catch (e) {
-        if (e instanceof z.ZodError || e instanceof Error) setError(e.message);
-        console.log(e)
-      }
-    };
-  
-    // ERROR STATES NEED TO BE SET
-    return (
-      <form onSubmit={handleSubmit} className="flex flex-col">
-        <label htmlFor="points-to-win">Score To Win</label>
-        <input
-          type="text"
-          defaultValue={10}
-          id="points-to-win"
-          ref={pointsToWinInput}
-        />
-        <label htmlFor="cards-per-player">White Cards Per Player</label>
-        <input
-          type="text"
-          defaultValue={10}
-          id="cards-per-player"
-          ref={cardsPerPlayerInput}
-        />
-        <label htmlFor="packs">Card Packs</label>
-        <fieldset
-          name="packs"
-          id="packs"
-          ref={cardPacksSelect}
-          className="flex max-h-80 max-w-fit flex-col overflow-y-scroll"
-        >
-          {data.cardPacks.map((pack) => (
-            <>
-              <label htmlFor={pack.name} key={pack.id+ "label"}>{pack.name}</label>
-              <input
-                type="checkbox"
-                key={pack.id}
-                name={pack.name}
-                value={pack.id}
-              />
-            </>
-          ))}
-        </fieldset>
-        <button type="submit">Start Game</button>
-      </form>
-    );
+      const packData = await trpcContext.game.getSelectedCardPacks.fetch(
+        cardPacks
+      );
+      ///////////////////////////
+      //ERROR NEEDS TO BE SET WITH TRY CATCH
+      ///////////////////////////
+      const playerData = (
+        await trpcContext.lobby.getConnectedPlayers.fetch(lobby.id)
+      ).map((player) => player.id);
+      if (!packData) throw new Error("No card packs found");
+      const whiteCards: z.infer<typeof CardDataType>[] = [];
+      const blackCards: z.infer<typeof CardDataType>[] = [];
+      packData.cardPacks.forEach((pack) => {
+        whiteCards.push(...pack.whiteCards);
+        blackCards.push(...pack.blackCards);
+      });
+      whiteCards.sort(() => Math.random() - 0.5);
+      blackCards.sort(() => Math.random() - 0.5);
+      const gameOptions = {
+        pointsToWin: pointsToWin ? parseInt(pointsToWin) : 10,
+        whiteCardsPerPlayer: cardsPerPlayer ? parseInt(cardsPerPlayer) : 10,
+        whiteCards,
+        blackCards,
+        currentCard: whiteCards.length - 1,
+      };
+
+      setOptions(gameOptions, playerData);
+      setisPlaying();
+      console.log("ran");
+    } catch (e) {
+      if (e instanceof z.ZodError || e instanceof Error) setError(e.message);
+      console.log(e);
+    }
   };
 
-  export default CAHOptions;
+  // ERROR STATES NEED TO BE SET
+  return (
+    <div className="mt-12 flex justify-center">
+      <form onSubmit={handleSubmit} className="flex flex-col  items-center">
+        <div className="flex flex-col items-center rounded-2xl  border-2 border-solid border-black/40 bg-zinc-500/40">
+          <label className="mt-4 text-lg" htmlFor="points-to-win">
+            Score To Win
+          </label>
+          <input
+            className="mt-2 w-48 rounded-xl border-2 border-black/10 bg-zinc-500/40 text-white"
+            type="text"
+            defaultValue={10}
+            id="points-to-win"
+            ref={pointsToWinInput}
+          />
+          <label className="mt-4 text-lg" htmlFor="cards-per-player">
+            White Cards Per Player
+          </label>
+          <input
+            className="mt-2 w-48 rounded-xl border-2 border-black/10 bg-zinc-500/40 text-white"
+            type="text"
+            defaultValue={10}
+            id="cards-per-player"
+            ref={cardsPerPlayerInput}
+          />
+          <label className="max-w-1/5 mt-4 mb-4 text-lg" htmlFor="packs">
+            Card Packs
+          </label>
+          <div className="p-4 ">
+            <fieldset
+              name="packs"
+              id="packs"
+              ref={cardPacksSelect}
+              className="max-h-60 max-w-md flex-col overflow-y-scroll rounded-xl border-2 border-solid bg-zinc-800/40 pl-6"
+            >
+              <div className=" flex flex-col">
+                {data.cardPacks.map((pack) => (
+                  <>
+                    <label htmlFor={pack.name} key={pack.id + "label"}>
+                      {pack.name}
+                    </label>
+                    <div className=" relative bottom-5   mr-3 inline flex justify-end">
+                      <input
+                        type="checkbox"
+                        key={pack.id}
+                        name={pack.name}
+                        value={pack.id}
+                      />
+                    </div>
+                  </>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        </div>
+        <button
+          className="mt-14 h-14 w-2/5 rounded-xl bg-blue-500 font-bold text-white hover:bg-blue-700"
+          type="submit"
+        >
+          Start Game
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default CAHOptions;
