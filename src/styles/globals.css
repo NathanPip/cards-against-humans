@@ -3,6 +3,20 @@
 @tailwind utilities;
 
 body {
-    background: linear-gradient(90deg, #2e026d, #15162c);
-    color: white;
+  background: linear-gradient(90deg, #2e026d, #15162c);
+  color: white;
+}
+
+#packs::-webkit-scrollbar {
+  width: 0.6em;
+}
+
+#packs::-webkit-scrollbar-track {
+  background: rgb(45, 92, 76);
+  border-radius: 1em;
+}
+
+#packs::-webkit-scrollbar-thumb {
+  background: rgba(9, 6, 84, 0.188);
+  border-radius: 1em;
 }
