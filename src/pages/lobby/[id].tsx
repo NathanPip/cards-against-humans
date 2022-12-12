@@ -75,10 +75,28 @@ const NameInput: React.FC<{
   };
 
   return (
-    <form onSubmit={onSubmitHandler}>
-      <input ref={inputRef} type="text" placeholder="Enter your name" />
-      <button type="submit">Enter</button>
-    </form>
+    <div className="m-auto flex h-screen w-screen items-center justify-center">
+      <div className=" max-h-1/5 max-w-1/5 flex h-fit flex-col justify-center gap-3 rounded-3xl border-2 border-black/40 bg-gray-900/40">
+        <h2 className="flex justify-center pt-8 text-lg">Enter Your Name</h2>
+        <form
+          className="flex flex-col items-center justify-center gap-3 px-8 pb-8"
+          onSubmit={onSubmitHandler}
+        >
+          <input
+            className="max-w-full rounded-xl border-2 border-black/10 bg-zinc-500/40  tracking-wide text-white"
+            ref={inputRef}
+            type="text"
+            placeholder="Don't Be Racist :)"
+          />
+          <button
+            className="rounded bg-zinc-500/40 py-1 px-2 text-sm text-white hover:bg-zinc-700"
+            type="submit"
+          >
+            Enter
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 
