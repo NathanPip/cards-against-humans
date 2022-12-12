@@ -4,7 +4,7 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { createContext, useRef, useState } from "react";
-import Error from "../../components/Error";
+import ErrorPage from "../../components/Error";
 import Loading from "../../components/Loading";
 import LobbyScreen from "../../components/Lobby/LobbyScreen";
 import { type Presence, RoomProvider } from "../../liveblocks.config";
@@ -33,9 +33,9 @@ const GameRoom: NextPage = () => {
 
   if (!id || Array.isArray(id) || lobby.isLoading) return <Loading />;
 
-  if (lobby.error || lobby.isLoadingError) return <Error />;
+  if (lobby.error || lobby.isLoadingError) return <ErrorPage />;
 
-  if (!lobby.data?.id) return <Error message="Not Found" />;
+  if (!lobby.data?.id) return <ErrorPage message="Not Found" />;
 
   return (
     <>

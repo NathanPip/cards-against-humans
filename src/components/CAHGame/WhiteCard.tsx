@@ -17,10 +17,6 @@ const WhiteCard: React.FC<WhiteCardProps> = ({card, setHand}) => {
 
   const cardClickHandler = (e: MouseEvent<HTMLParagraphElement>) => {
     console.log("clicked")
-    if(!e.target || !setHand) return; //Error
-    const cardEl = e.target as HTMLElement;
-    const id = cardEl.dataset.id;
-    if(!id) return; //Error
     if(!card) return; //Error
     setHand(prev => prev?.filter(prev => prev !== card))
     selectCard(card);

@@ -49,11 +49,12 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
       const blackCards = new LiveList(parsedOptions.blackCards)
       const parsedPlayers = ConnectedPlayersParser.parse(players);
       const playersList = new LiveList(parsedPlayers);
+      console.log(storage.get("CAH"))
       storage.get("CAH").set("options", obj);
       storage.get("CAH").set("whiteCards", whiteCards);
       storage.get("CAH").set("blackCards", blackCards);
       storage.get("CAH").set("connectedPlayers", playersList);
-      storage.get("CAH").set("currentCard", parsedOptions.whiteCards.length)
+      storage.get("CAH").set("currentWhiteCard", parsedOptions.whiteCards.length)
       storage.get("CAH").set("currentBlackCard", parsedOptions.blackCards.length-1)
       storage.get("CAH").set("currentPlayerDrawing", parsedPlayers[0]);
       storage.get("CAH").set("currentPlayerTurn", parsedPlayers[Math.floor(Math.random() * parsedPlayers.length)]);
@@ -107,8 +108,10 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   
         setOptions(gameOptions, playerData);
         setisPlaying();
+        console.log("ran");
       } catch (e) {
         if (e instanceof z.ZodError || e instanceof Error) setError(e.message);
+        console.log(e)
       }
     };
   

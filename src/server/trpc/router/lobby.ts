@@ -8,6 +8,7 @@ export const lobbyRouter = router({
   createLobby: publicProcedure
     .input(z.object({ name: z.string(), id: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      try{
       if (!ctx.session?.user?.id) throw new TRPCError({ code: "UNAUTHORIZED", message: "must be logged in" });
       const newRoom = await createRoom({
         id: input.id,
@@ -17,6 +18,9 @@ export const lobbyRouter = router({
       await ctx.prisma.lobby.create({
         data: { name: input?.name, id: input?.id, userId: ctx.session.user.id },
       });
+    } catch(e) {
+      throw new Error("Error creating lobby");
+    }
     }),
   getLobby: publicProcedure
     .input(z.object({ id: z.string().nullish() }))

@@ -44,9 +44,15 @@ const PlayerDeck: React.FC = () => {
     storage.get("CAH").set("activeState", "dealing whites");
   }, []);
 
-  const startGame = liveblocksMutation(async ({ storage, setMyPresence }) => {
+  const startGame = liveblocksMutation(async ({ storage, self, setMyPresence }) => {
     storage.get("CAH").set("activeState", "waiting for players");
-    setMyPresence({ currentAction: "selecting" });
+    const currentPlayerTurn = storage.get("CAH").get("currentPlayerTurn");
+    if(self.id !== currentPlayerTurn){
+      setMyPresence({ currentAction: "selecting" });
+    } else {
+      setMyPresence({ currentAction: "waiting" });
+      setMyPresence({ CAHturn: true });
+    }
   }, []);
 
   // Initial Draw BE CAREFUL
