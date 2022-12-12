@@ -1,5 +1,10 @@
-import { createClient, type LiveList, type LiveObject } from "@liveblocks/client";
+import {
+  createClient,
+  type LiveList,
+  type LiveObject,
+} from "@liveblocks/client";
 import { createRoomContext } from "@liveblocks/react";
+import { type CAHWhiteCard } from "@prisma/client";
 import { type CAHGameOptions } from "./types/game";
 
 const client = createClient({
@@ -10,7 +15,7 @@ export type Presence = {
   name: string;
   score?: number;
   isHost?: boolean;
-  currentAction: string;
+  currentAction: "waiting" | "drawing" | "judging" | "selecting";
   CAHWhiteCardIds?: string[];
   CAHBlackCardIds?: string[];
   CAHturn?: boolean;
@@ -21,13 +26,34 @@ export type Storage = {
   owner: string;
   currentGame: null | "Cards Against Humanity";
   CAH: LiveObject<{
-    options: CAHGameOptions
+    options: CAHGameOptions;
+    whiteCards: LiveList<{id: string, text: string}>;
+    blackCards: LiveList<{id: string, text: string}>;
+    cardsInRound: LiveList<Pick<CAHWhiteCard, "id" | "text"> & {playerId: string}> | undefined;
+    currentWhiteCard: number | undefined;
+    currentBlackCard: number | undefined;
     connectedPlayers: LiveList<string>;
-    currentPlayerDrawing: string | undefined,
-    currentCard: number
+    currentPlayerDrawing: string | undefined;
+    currentPlayerTurn: string | undefined;
+    activeState:
+      "dealing whites"
+      | "waiting for players"
+      | "waiting for judge"
+      | "starting game"
+      | "ending game";
   }>;
 };
 
 export const {
-  suspense: { RoomProvider, useMyPresence, useSelf, useOthersMapped, useStorage, useMutation, useUpdateMyPresence },
+  suspense: {
+    RoomProvider,
+    useMyPresence,
+    useSelf,
+    useOthersMapped,
+    useStorage,
+    useMutation,
+    useUpdateMyPresence,
+    useBroadcastEvent,
+    useEventListener
+  },
 } = createRoomContext<Presence, Storage>(client);

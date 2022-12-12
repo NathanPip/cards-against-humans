@@ -1,16 +1,17 @@
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { trpc } from "../../utils/trpc";
 import { v4 as uuid } from "uuid";
+import ErrorPage from "../../components/Error";
 
 const Lobby: NextPage = () => {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
   const { data: sessionData } = useSession();
   const lobbyMutation = trpc.lobby.createLobby.useMutation();
-  if (!sessionData) return null;
+  const [error, setError] = useState<Error | undefined>();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,10 +25,15 @@ const Lobby: NextPage = () => {
       console.log("completed");
       router.push(`/lobby/${lobbyID}`);
     } catch (e) {
-      console.log(e);
+      let error;
+      if(e instanceof Error){ 
+        error = e;
+      }
+      setError(error)
     }
   };
-
+  if (!sessionData) return null;
+  if(error) return <ErrorPage />
   return (
     <div className="m-auto flex h-screen w-screen items-center justify-center">
       <div className=" max-h-1/5 max-w-1/5 flex h-fit flex-col justify-center gap-3 rounded-3xl border-2 border-black/40 bg-gray-900/40">

@@ -4,7 +4,7 @@ type Props = {
   message?: "Not Found" | "Internal Server Error" | "Not Authorized";
 };
 
-const Error: React.FC<Props> = (Props) => {
+const ErrorPage: React.FC<Props> = (Props) => {
   return (
     <div className=" flex h-screen justify-center ">
       <div className=" flex flex-col items-center justify-center space-y-10">
@@ -34,4 +34,4 @@ const Error: React.FC<Props> = (Props) => {
   );
 };
 
-export default Error;
+export default ErrorPage;

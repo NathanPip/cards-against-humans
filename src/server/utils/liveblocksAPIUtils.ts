@@ -33,6 +33,8 @@ export const createRoom = async (
         body: JSON.stringify(params),
       });
       const data = (await response.json()) as CreateRoomResponse;
+      console.log(data);
+      if (response.status !== 200) throw new Error("Couldn't create room");
       resolve(data);
     } catch (error) {
       console.log(error);
@@ -56,48 +58,27 @@ const initialRoomStorageBody = {
       liveblocksType: "LiveObject",
       data: {
         options: {
-          pointsToWin: 10,
-          whiteCardsPerPlayer: 10,
-          cardPacks: {
-            liveblocksType: "LiveList",
-            data: [],
+          liveblocksType: "LiveObject",
+          data:{
+            pointsToWin: 10,
+            whiteCardsPerPlayer: 10,
           },
         },
-        currentPlayableBlacks: {
-          liveblocksType: "LiveList",
-          data: [],
-        },
-        currentPlayableWhites: {
-          liveblocksType: "LiveList",
-          data: [],
-        },
+        whiteCardIds: {liveblocksType: "LiveList", data: []},
+        blackCardIds: {liveblocksType: "LiveList", data: []},
+        whiteCards: {liveblocksType: "LiveList", data: []},
+        blackCards: {liveblocksType: "LiveList", data: []},
+        cardsInRound: {liveblocksType: "LiveList", data: []},
+        connectedPlayers: {liveblocksType: "LiveList", data: []},
+        currentWhiteCard: 0,
+        currentBlackCard: 0,
+        currentPlayerDrawing: "",
+        currentPlayerTurn: "",
+        activeState: "ending game",
       },
     },
   },
 };
-
-const initialRoomStorageBodyParser = z.object({
-  liveblocksType: z.literal("LiveObject"),
-  data: z.object({
-    name: z.string(),
-    owner: z.string().cuid(),
-    currentGame: z.literal("Cards Against Humanity").nullish(),
-    CAH: z.object({
-      liveblocksType: z.literal("LiveObject"),
-      data: z.object({
-        options: z.object({
-          pointsToWin: z.number().min(1).max(100),
-          whiteCardsPerPlayer: z.number().min(1).max(25),
-          cardPacks: z.object({
-            liveblocksType: z.literal("LiveList"),
-            data: z.array(z.string()),
-          }),
-        }),
-        
-      }),
-    }),
-  }),
-});
 
 export const setInitialRoomStorage = async (
   roomId: string,
@@ -107,19 +88,18 @@ export const setInitialRoomStorage = async (
     try {
       initialRoomStorageBody.data.name = initialRoomStorage.name;
       initialRoomStorageBody.data.owner = initialRoomStorage.owner;
-
-      const parsedInitialStorageBody = initialRoomStorageBodyParser.parse(
-        initialRoomStorageBody
-      );
-
-      await fetch(`https://api.liveblocks.io/v2/rooms/${roomId}/storage`, {
+      const res = await fetch(`https://api.liveblocks.io/v2/rooms/${roomId}/storage`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${env.LIVEBLOCKS_SECRET_KEY}`,
         },
-        body: JSON.stringify(parsedInitialStorageBody),
+        body: JSON.stringify(initialRoomStorageBody),
       });
+      const data = await res.json();
+      console.log(data)
+      if(res.status !== 200) throw new Error("Serverless error");
+      console.log("the response", data);
       resolve(true);
     } catch (error) {
       reject(error);

@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { LiveList } from "@liveblocks/client";
+import { type MouseEvent, useEffect, useState } from "react";
 import {
   useSelf,
   useMutation as liveblocksMutation,
   useStorage,
   useUpdateMyPresence,
+  useBroadcastEvent
 } from "../../liveblocks.config";
-import { trpc } from "../../utils/trpc";
+import WhiteCard from "./WhiteCard";
 
 const PlayerDeck: React.FC = () => {
   const updatePresence = useUpdateMyPresence();
@@ -13,71 +15,111 @@ const PlayerDeck: React.FC = () => {
     (root) => root.CAH.currentPlayerDrawing
   );
   const connectedPlayers = useStorage((root) => root.CAH.connectedPlayers);
-  const whiteCardIds = useStorage((root) => root.CAH.options.whiteCardIds);
-  const currentCard = useStorage((root) => root.CAH.currentCard);
+  const whiteCards = useStorage((root) => root.CAH.whiteCards);
+  const currentCard = useStorage((root) => root.CAH.currentWhiteCard);
   const whiteCardsPerPlayer = useStorage(
     (root) => root.CAH.options.whiteCardsPerPlayer
   );
+
+  const broadcast = useBroadcastEvent();
+
   const selfId = useSelf((me) => me.id);
 
-  const [hand, setHand] = useState<{text: string, type: string, id: string}[]>();
+  const activeState = useStorage((root) => root.CAH.activeState);
 
-  const trpcContext = trpc.useContext();
+  const isHost = useSelf((me) => me.presence.isHost);
+
+  const [hand, setHand] = useState<{ text: string; id: string }[]>();
 
   const drawInitialCards = liveblocksMutation(
-    async ({ storage }, nextPlayer: string | undefined, hand: string[] ) => {
-      const cards = await trpcContext.game.getSelectedCards.fetch( hand );
-      storage.get("CAH").set("currentCard", currentCard-hand.length);
-      setHand(cards.whiteCards);
+    async ({ storage }, nextPlayer: string | undefined, hand: string[]) => {
+      if (!currentCard) throw new Error("No current card");
+      storage.get("CAH").set("currentWhiteCard", currentCard - hand.length);
       storage.get("CAH").set("currentPlayerDrawing", nextPlayer);
     },
     [currentPlayerDrawing, selfId]
   );
 
-  console.log(currentCard);
+  const dealWhites = liveblocksMutation(async ({ storage }) => {
+    storage.get("CAH").set("activeState", "dealing whites");
+  }, []);
 
+  const startGame = liveblocksMutation(async ({ storage, self, setMyPresence }) => {
+    storage.get("CAH").set("activeState", "waiting for players");
+    const currentPlayerTurn = storage.get("CAH").get("currentPlayerTurn");
+    if(self.id !== currentPlayerTurn){
+      setMyPresence({ currentAction: "selecting" });
+    } else {
+      setMyPresence({ currentAction: "waiting" });
+      setMyPresence({ CAHturn: true });
+    }
+  }, []);
+
+  // Initial Draw BE CAREFUL
   useEffect(() => {
     if (
-      !currentPlayerDrawing ||
       !selfId ||
-      !whiteCardIds ||
+      !whiteCards ||
       !currentCard ||
       !whiteCardsPerPlayer ||
       !connectedPlayers
     )
       return;
-
-    console.log("ran")
-    console.log(currentPlayerDrawing, selfId)
-    if (currentPlayerDrawing === selfId) {
-      console.log(whiteCardIds)
-      console.log(whiteCardIds.length - whiteCardsPerPlayer - 1);
-      const hand = whiteCardIds.slice(
-        currentCard - whiteCardsPerPlayer - 1,
-        currentCard
-      );
-      console.log(hand);
-      const nextPlayer =
-        connectedPlayers[connectedPlayers.length - 1] !== selfId
-          ? connectedPlayers[connectedPlayers.indexOf(selfId) + 1]
-          : undefined;
-      updatePresence({ CAHWhiteCardIds: hand });
-      drawInitialCards(nextPlayer, hand);
+    if (activeState === "starting game") dealWhites();
+    if (activeState === "dealing whites") {
+      if (currentPlayerDrawing === selfId) {
+        updatePresence({ currentAction: "drawing" });
+        const hand = whiteCards.slice(
+          currentCard - whiteCardsPerPlayer - 1,
+          currentCard
+        );
+        const nextPlayer =
+          connectedPlayers[connectedPlayers.length - 1] !== selfId
+            ? connectedPlayers[connectedPlayers.indexOf(selfId) + 1]
+            : "";
+        console.log("next player", nextPlayer);
+        drawInitialCards(
+          nextPlayer,
+          hand.map((card) => card.id)
+        );
+        setHand(hand);
+      }
+      console.log("current player drawing " + currentPlayerDrawing);
+      if (isHost && currentPlayerDrawing === "") {
+        console.log("run");
+        startGame();
+        broadcast({ type: "game action", action: "start game"} as never)
+      }
     }
   }, [
     currentPlayerDrawing,
     selfId,
-    whiteCardIds,
+    whiteCards,
     currentCard,
     whiteCardsPerPlayer,
     updatePresence,
     connectedPlayers,
     drawInitialCards,
+    isHost,
+    activeState,
+    startGame,
+    dealWhites,
+    broadcast
   ]);
 
-  return <div>
-    {hand && hand.map((card) => <p key={card.id}>{card.text}</p>)}
-  </div>;
+  useEffect(() => {
+    if(!hand) return;
+      updatePresence({ CAHWhiteCardIds: hand.map((card) => card.id) });
+  }, [hand, updatePresence])
+
+  return (
+    <div>
+      {hand &&
+        hand.map((card) => (
+          <WhiteCard card={card} setHand={setHand} key={card.id}/>
+        ))}
+    </div>
+  );
 };
 
 export default PlayerDeck;

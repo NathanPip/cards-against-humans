@@ -34,11 +34,13 @@ export const gameRouter = router({
           blackCards: {
             select: {
               id: true,
+              text: true,
             },
           },
           whiteCards: {
             select: {
               id: true,
+              text: true,
             },
           },
         },

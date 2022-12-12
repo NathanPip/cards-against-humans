@@ -1,8 +1,9 @@
 import { type LiveObject, type LiveList } from "@liveblocks/client"
+import { CAHWhiteCard } from "@prisma/client"
 
 export type CAHGameOptions = LiveObject<{
     pointsToWin: number
     whiteCardsPerPlayer: number,
-    whiteCardIds: LiveList<string>,
-    blackCardIds: LiveList<string>
 }>
+
+export type Card = Pick<CAHWhiteCard, "id" | "text">

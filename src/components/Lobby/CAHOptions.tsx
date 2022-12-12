@@ -1,4 +1,5 @@
 import { LiveList, LiveObject } from "@liveblocks/client";
+import { type CAHBlackCard, type CAHWhiteCard } from "@prisma/client";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useContext, useRef, useState } from "react";
 import { z } from "zod";
@@ -11,17 +12,22 @@ import { trpc } from "../../utils/trpc";
 type CAHOptionsProps = {
     data: inferRouterOutputs<AppRouter>["game"]["getBasicGameInfo"];
   };
+
+const CardDataType = z.object({
+  id: z.string().cuid(),
+  text: z.string(),
+})
   
-  const FormOptionsInputsParser = z.object({
+const FormOptionsInputsParser = z.object({
     pointsToWin: z.number().min(1).max(100),
     whiteCardsPerPlayer: z.number().min(1).max(25),
-    whiteCardIds: z.array(z.string().cuid()),
-    blackCardIds: z.array(z.string().cuid()),
-  });
+    whiteCards: z.array(CardDataType),
+    blackCards: z.array(CardDataType),
+});
   
-  const ConnectedPlayersParser = z.array(z.string()).nonempty()
+const ConnectedPlayersParser = z.array(z.string()).nonempty()
   
-  const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
+const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
     const pointsToWinInput = useRef<HTMLInputElement>(null);
     const cardsPerPlayerInput = useRef<HTMLInputElement>(null);
     const cardPacksSelect = useRef<HTMLFieldSetElement>(null);
@@ -38,15 +44,21 @@ type CAHOptionsProps = {
       const obj: CAHGameOptions = new LiveObject({
         pointsToWin: parsedOptions.pointsToWin,
         whiteCardsPerPlayer: parsedOptions.whiteCardsPerPlayer,
-        whiteCardIds: new LiveList(parsedOptions.whiteCardIds),
-        blackCardIds: new LiveList(parsedOptions.blackCardIds),
       });
+      const whiteCards = new LiveList(parsedOptions.whiteCards)
+      const blackCards = new LiveList(parsedOptions.blackCards)
       const parsedPlayers = ConnectedPlayersParser.parse(players);
       const playersList = new LiveList(parsedPlayers);
+      console.log(storage.get("CAH"))
       storage.get("CAH").set("options", obj);
+      storage.get("CAH").set("whiteCards", whiteCards);
+      storage.get("CAH").set("blackCards", blackCards);
       storage.get("CAH").set("connectedPlayers", playersList);
-      storage.get("CAH").set("currentCard", parsedOptions.whiteCardIds.length)
+      storage.get("CAH").set("currentWhiteCard", parsedOptions.whiteCards.length)
+      storage.get("CAH").set("currentBlackCard", parsedOptions.blackCards.length-1)
       storage.get("CAH").set("currentPlayerDrawing", parsedPlayers[0]);
+      storage.get("CAH").set("currentPlayerTurn", parsedPlayers[Math.floor(Math.random() * parsedPlayers.length)]);
+      storage.get("CAH").set("activeState", "starting game");
     }, []);
   
     const setisPlaying = liveblocksMutation(({ storage }) => {
@@ -76,28 +88,30 @@ type CAHOptionsProps = {
         ///////////////////////////
       //ERROR NEEDS TO BE SET WITH TRY CATCH
       ///////////////////////////
-        const playerData = await (await trpcContext.lobby.getConnectedPlayers.fetch(lobby.id)).map((player) => player.id);
+        const playerData = (await trpcContext.lobby.getConnectedPlayers.fetch(lobby.id)).map((player) => player.id);
         if (!packData) throw new Error("No card packs found");
-        const whiteCardIds: string[] = [];
-        const blackCardIds: string[] = [];
+        const whiteCards: z.infer<typeof CardDataType>[] = [];
+        const blackCards: z.infer<typeof CardDataType>[] = [];
         packData.cardPacks.forEach((pack) => {
-          whiteCardIds.push(...pack.whiteCards.map((card) => card.id));
-          blackCardIds.push(...pack.blackCards.map((card) => card.id));
+          whiteCards.push(...pack.whiteCards);
+          blackCards.push(...pack.blackCards);
         });
-        whiteCardIds.sort(() => Math.random() - 0.5);
-        blackCardIds.sort(() => Math.random() - 0.5);
+        whiteCards.sort(() => Math.random() - 0.5);
+        blackCards.sort(() => Math.random() - 0.5);
         const gameOptions = {
           pointsToWin: pointsToWin ? parseInt(pointsToWin) : 10,
           whiteCardsPerPlayer: cardsPerPlayer ? parseInt(cardsPerPlayer) : 10,
-          whiteCardIds,
-          blackCardIds,
-          currentCard: whiteCardIds.length-1
+          whiteCards,
+          blackCards,
+          currentCard: whiteCards.length-1
         };
   
         setOptions(gameOptions, playerData);
         setisPlaying();
+        console.log("ran");
       } catch (e) {
         if (e instanceof z.ZodError || e instanceof Error) setError(e.message);
+        console.log(e)
       }
     };
   
