@@ -50,6 +50,7 @@ const PlayerDeck: React.FC = () => {
     if(self.id !== currentPlayerTurn){
       setMyPresence({ currentAction: "selecting" });
     } else {
+      console.log("isTurn")
       setMyPresence({ currentAction: "waiting" });
       setMyPresence({ CAHturn: true });
     }
@@ -73,6 +74,7 @@ const PlayerDeck: React.FC = () => {
           currentCard - whiteCardsPerPlayer - 1,
           currentCard
         );
+        console.log(hand);
         const nextPlayer =
           connectedPlayers[connectedPlayers.length - 1] !== selfId
             ? connectedPlayers[connectedPlayers.indexOf(selfId) + 1]
@@ -116,7 +118,7 @@ const PlayerDeck: React.FC = () => {
     <div>
       {hand &&
         hand.map((card) => (
-          <WhiteCard card={card} setHand={setHand} key={card.id}/>
+          <WhiteCard card={card} type="hand" setHand={setHand} key={card.id}/>
         ))}
     </div>
   );

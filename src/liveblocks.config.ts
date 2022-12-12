@@ -40,6 +40,7 @@ export type Storage = {
       | "waiting for players"
       | "waiting for judge"
       | "starting game"
+      | "ending round"
       | "ending game";
   }>;
 };
