@@ -35,13 +35,14 @@ const GameManager: React.FC = () => {
     (root) => root.CAH.currentPlayerDrawing
   );
 
+  ///////////////////////////////// EVENT LISTENER //////////////////////////////////////
+
   // LIVEBLOCKS EVENT LISTENER
   useEventListener(({ event }) => {
     // GAME STATE EVENTS
     if (event.type === "game action") {
+      // check if it's player's turn and update presence
       if (event.action === "start game") {
-        console.log("my id is", id);
-        console.log("current player turn is", currentPlayerTurn);
         if (id !== currentPlayerTurn) {
           console.log("notTurn");
           updatePresence({ currentAction: "selecting" });
@@ -64,7 +65,7 @@ const GameManager: React.FC = () => {
 
     // JUDGE EVENTS
     if (event.type === "judge") {
-      console.log(event);
+      // check if player has won round and update presence
       if (event.data) {
         if (event.data.id === id) {
           if (!event.data.card.id) throw new Error("no card id");
@@ -79,14 +80,20 @@ const GameManager: React.FC = () => {
     }
   });
 
+///////////////////////////////// GAME STATE MUTATIONS //////////////////////////////////////
+
+  // STARTING A NEW ROUND
   const startNewRound = liveblocksMutation(({ storage, setMyPresence }) => {
+    // set the next player turn
     const currentPlayer = storage.get("CAH").get("currentPlayerTurn");
     const players = storage.get("CAH").get("connectedPlayers");
     if (!currentPlayer) throw new Error("No current player");
     const index = players.indexOf(currentPlayer);
     const nextPlayerIndex = index + 1 > players.length - 1 ? 0 : index + 1;
     const nextPlayer = players[nextPlayerIndex];
+    storage.get("CAH").set("currentPlayerTurn", nextPlayer);
 
+    // set the next black card
     const currentBlackCard = storage.get("CAH").get("currentBlackCard");
     const blackCards = storage.get("CAH").get("blackCards");
     const blackCardIndex = blackCards.indexOf(currentBlackCard);
@@ -95,10 +102,14 @@ const GameManager: React.FC = () => {
     const nextBlackCard = blackCards[nextBlackCardIndex];
     if (!nextBlackCard) throw new Error("No next black card found");
     storage.get("CAH").set("currentBlackCard", nextBlackCard);
-    storage.get("CAH").set("currentPlayerTurn", nextPlayer);
+
+    // reset round data
     storage.get("CAH").set("cardsInRound", []);
+
+    // set game state to starting round
     storage.get("CAH").set("activeState", "starting round");
 
+    // since host is the only client who can run function, update host presence based on new data
     setMyPresence({ CAHCardsPicked: [] });
 
     console.log("my id is", id);
@@ -115,10 +126,12 @@ const GameManager: React.FC = () => {
     }
   }, []);
 
+  // starts a new round when all players are ready
   const setRoundStart = liveblocksMutation(({ storage }) => {
     storage.get("CAH").set("activeState", "waiting for players");
   }, []);
 
+  // if host, check if all players are ready to start new round, and if so, start new round
   useEffect(() => {
     if (gameState === "starting round" && isHost) {
       let allReady = true;
@@ -135,6 +148,7 @@ const GameManager: React.FC = () => {
     }
   }, [gameState, isHost, othersActions, broadcast, setRoundStart]);
 
+  // if NOT host and game state is starting round, check if other data has changed, and if changes have been received, set ready to start
   useEffect(() => {
     if (
       gameState === "starting round" &&
@@ -145,7 +159,7 @@ const GameManager: React.FC = () => {
     }
   }, [gameState, isHost, cardsInRound, updatePresence]);
 
-  // TRIGGER RESTART ROUND
+  // triggers a restart round if all players have drawn and round has ended
   useEffect(() => {
     if (isHost && gameState === "ending round") {
       let allDrawn = true;
@@ -163,6 +177,8 @@ const GameManager: React.FC = () => {
       }
     }
   }, [gameState, othersDrawing, isHost, startNewRound, broadcast, actionState]);
+
+  /////////////////////////////// GAME START //////////////////////////////////////
 
   // START GAME ONCE PLAYERS HAVE DRAWN
   const startGame = liveblocksMutation(async ({ storage, setMyPresence }) => {
@@ -190,12 +206,12 @@ const GameManager: React.FC = () => {
     }
   }, [isHost, currentPlayerDrawing, gameState, startGame, broadcast]);
 
-  // SET AMOUNT OF WHITE CARDS TO PICK
-
+  // set amount of white cards to pick
   const setWhiteCardsToPick = liveblocksMutation(({ storage }, num: number) => {
     storage.get("CAH").set("whiteCardsToPick", num);
   }, []);
 
+  // check amount of white cards that are needed for black card and set that amount
   useEffect(() => {
     if (currentBlackCard && isHost) {
       const whiteCardAmt = currentBlackCard.text.split("_").length - 1;
