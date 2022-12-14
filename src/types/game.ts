@@ -6,4 +6,4 @@ export type CAHGameOptions = LiveObject<{
     whiteCardsPerPlayer: number,
 }>
 
-export type Card = Pick<CAHWhiteCard, "id" | "text">
+export type Card = Pick<CAHWhiteCard, "id" | "text"> & {playerId?: string}

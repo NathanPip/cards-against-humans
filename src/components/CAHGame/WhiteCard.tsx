@@ -1,48 +1,93 @@
-import { LiveList } from "@liveblocks/client";
-import { MouseEvent } from "react";
-import { useSelf, useStorage, useMutation as liveblocksMutation } from "../../liveblocks.config";
-import { Card } from "../../types/game";
+import { LiveList, LiveObject } from "@liveblocks/client";
+import { useState } from "react";
+import {
+  useSelf,
+  useStorage,
+  useMutation as liveblocksMutation,
+  useBroadcastEvent,
+} from "../../liveblocks.config";
+import { type Card } from "../../types/game";
 
 type WhiteCardProps = {
-    card: Card;
-    setHand: React.Dispatch<React.SetStateAction<Card[] | undefined>>;
-}
+  card: Card;
+  setHand?:
+    | React.Dispatch<React.SetStateAction<Card[] | undefined>>
+    | undefined;
+  type: "hand" | "round";
+};
 
-const WhiteCard: React.FC<WhiteCardProps> = ({card, setHand}) => {
-
+const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type }) => {
   const isTurn = useSelf((me) => me.presence.CAHturn);
   const actionState = useSelf((me) => me.presence.currentAction);
-  const activeState = useStorage((root) => root.CAH.activeState);
+  const gameState = useStorage((root) => root.CAH.activeState);
   const selfId = useSelf((me) => me.id);
+  const [revealed, setRevealed] = useState(type === "hand" ? true : false);
 
-  const cardClickHandler = (e: MouseEvent<HTMLParagraphElement>) => {
-    console.log("clicked")
-    if(!card) return; //Error
-    setHand(prev => prev?.filter(prev => prev !== card))
-    selectCard(card);
-    console.log("completed")
-  }
+  const broadcast = useBroadcastEvent();
 
-  const selectCard = liveblocksMutation( async ({ storage, setMyPresence }, card: {id: string, text: string}) => {
-    const cardsInRound = storage.get("CAH").get("cardsInRound") || [];
-    if(!selfId) throw new Error("No selfId");
-    storage.get("CAH").set("cardsInRound", new LiveList([...cardsInRound, {...card, playerId: selfId}]));
+  const selectCard = liveblocksMutation(
+    async ({ storage, setMyPresence, self }, card: Card) => {
+      const cardsInRound = storage.get("CAH").get("cardsInRound") || [];
+      if (selfId === undefined) throw new Error("No selfId");
+      const cardsPicked = self.presence.CAHCardsPicked || [];
+      console.log(cardsPicked);
+      const numCardsNeeded = storage.get("CAH").get("whiteCardsToPick");
+      if (numCardsNeeded === undefined)
+        throw new Error("No numCardsNeeded found");
+      if (cardsPicked.length < numCardsNeeded - 1) {
+        setMyPresence({
+          CAHCardsPicked: [...cardsPicked, { ...card, playerId: selfId }],
+        });
+      } else if (cardsPicked.length >= numCardsNeeded - 1) {
+        setMyPresence({
+          CAHCardsPicked: [...cardsPicked, { ...card, playerId: selfId }],
+        });
+        storage.get("CAH").set("cardsInRound", [
+          ...cardsInRound,
+          {
+            cards: [...cardsPicked, { ...card, playerId: selfId }],
+            playerId: selfId,
+          },
+        ]);
+        setMyPresence({ currentAction: "drawing" });
+      }
+    },
+    []
+  );
 
-    setMyPresence({currentAction: "drawing"});
-  }, [])
+  const cardClickHandler = () => {
+    if (!card) return; //Error
+    console.log(
+      "action state: " + actionState,
+      "game state: " + gameState,
+      "turn " + isTurn
+    );
+    if (
+      type === "hand" &&
+      actionState === "selecting" &&
+      gameState === "waiting for players" &&
+      !isTurn &&
+      setHand
+    ) {
+      console.log("hand");
+      setHand((prev) => prev?.filter((prev) => prev !== card));
+      selectCard(card);
+    } else if (
+      type === "round" &&
+      isTurn &&
+      gameState === "waiting for judge"
+    ) {
+      if (!card.playerId) throw new Error("No player id attached to card");
+      setRevealed(true);
+    }
+    console.log("completed");
+  };
 
-    return (
-        <div>
-            <p
-            onClick={(e) =>
-                !isTurn &&
-                actionState === "selecting" &&
-                activeState === "waiting for players"
-                  ? cardClickHandler(e)
-                  : null
-              }>{card.text}</p>
-        </div>
-    )
-}
+  return (
+    <div>
+      <p onClick={cardClickHandler}>{card.text}</p>
+    </div>
+  );
+};
 
 export default WhiteCard;
