@@ -57,10 +57,10 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
       storage.get("CAH").set("connectedPlayers", playersList);
       storage
         .get("CAH")
-        .set("currentWhiteCard", parsedOptions.whiteCards.length);
+        .set("currentWhiteCardIndex", parsedOptions.whiteCards.length);
       storage
         .get("CAH")
-        .set("currentBlackCard", parsedOptions.blackCards.length - 1);
+        .set("currentBlackCard", new LiveObject(parsedOptions.blackCards[parsedOptions.blackCards.length - 1]));
       storage.get("CAH").set("currentPlayerDrawing", parsedPlayers[0]);
       storage
         .get("CAH")

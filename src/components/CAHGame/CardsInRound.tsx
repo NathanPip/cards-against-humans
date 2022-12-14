@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useStorage, useMutation as liveblocksMutation, useSelf } from "../../liveblocks.config";
-import WhiteCard from "./WhiteCard";
+import PickedHand from "./PickedHand";
 
 
 const CardsInRound: React.FC = () => {
@@ -27,8 +27,8 @@ const CardsInRound: React.FC = () => {
     }, [cardsInRound, connectedPlayers, setJudging, gameState])
 
     return (
-        <div>
-            {cardsInRound && cardsInRound.map((card) => (<WhiteCard key={card.id} card={card} type="round" />))}
+        <div className="bg-blue-500 p-4">
+            {cardsInRound && cardsInRound.map((cards) => (<PickedHand key={cards.playerId} hand={cards}/>))}
         </div>
     )
 }

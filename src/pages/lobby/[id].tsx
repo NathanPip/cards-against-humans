@@ -18,6 +18,7 @@ const defaultPlayer: Presence = {
   CAHWhiteCardIds: [],
   CAHBlackCardIds: [],
   CAHturn: false,
+  CAHCardsPicked: [],
 };
 
 export const LobbyContext = createContext<null | Lobby>(null);

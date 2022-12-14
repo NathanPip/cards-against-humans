@@ -72,6 +72,7 @@ const initialRoomStorageBody = {
         connectedPlayers: {liveblocksType: "LiveList", data: []},
         currentWhiteCard: 0,
         currentBlackCard: 0,
+        whiteCardsToPick: 0,
         currentPlayerDrawing: "",
         currentPlayerTurn: "",
         activeState: "ending game",
