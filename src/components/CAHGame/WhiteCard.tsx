@@ -83,8 +83,8 @@ const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type }) => {
   };
 
   return (
-    <div>
-      <p onClick={cardClickHandler}>{card.text}</p>
+    <div onClick={cardClickHandler} className={`w-fit px-4 py-2 h-full bg-white rounded-lg ${type === "round" && "h-52"}`}>
+      <p className={`text-black w-48 text-xl`}>{card.text}</p>
     </div>
   );
 };

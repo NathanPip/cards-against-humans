@@ -26,12 +26,12 @@ const CAHGame: React.FC = () => {
   const isHost = useSelf((me) => me.presence.isHost);
   
   return (
-    <>
+    <div className="flex flex-col py-12">
       {isHost && <button onClick={endGame}>exit</button>}
+      <GameManager />
       <GameArea />
       <PlayerDeck />
-      <GameManager />
-    </>
+    </div>
   );
 };
 

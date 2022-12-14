@@ -1,24 +1,17 @@
-import { useStorage, useMutation as liveblocksMutation, useUpdateMyPresence } from "../../liveblocks.config";
+import { useStorage } from "../../liveblocks.config";
 import BlackCard from "./BlackCard";
 import CardsInRound from "./CardsInRound";
+import CurrentPicks from "./CurrentPicks";
 
 const GameArea: React.FC = () => {
 
-    const updatePresence = useUpdateMyPresence();
-    const activeState = useStorage((root) => root.CAH.activeState);
     const currentBlackCard = useStorage((root) => root.CAH.currentBlackCard);
-
-    const setNextBlackCard = liveblocksMutation(async ({ storage }) => {
-        if(!currentBlackCard) return;
-        // storage.get("CAH").set("currentBlackCard", currentBlackCardIndex + 1);
-    }, [currentBlackCard])
-
-    console.log(activeState);
+    const gameState = useStorage((root) => root.CAH.activeState);
 
     return (
-    <div className="p-4 bg-sky-400">
+    <div className="py-4 flex flex-col justify-center items-center max-w-full overflow-x-hidden">
         {currentBlackCard && <BlackCard card={currentBlackCard}/>}
-        <CardsInRound />
+        {gameState === "waiting for judge" || gameState === "ending round" ? <CardsInRound /> : <CurrentPicks/>}
     </div>
     )
 }

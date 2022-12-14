@@ -40,7 +40,7 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
   };
 
   return (
-    <div onClick={clickHandler}>
+    <div onClick={clickHandler} className="w-screen gap-2 flex flex-col items-center">
       {hand.cards.map((card) => {
         return <WhiteCard key={card.id} card={card} type="round" />;
       })}

@@ -34,6 +34,7 @@ const GameManager: React.FC = () => {
   const currentPlayerDrawing = useStorage(
     (root) => root.CAH.currentPlayerDrawing
   );
+  const connectedPlayers = useStorage((root) => root.CAH.connectedPlayers);
 
   ///////////////////////////////// EVENT LISTENER //////////////////////////////////////
 
@@ -80,7 +81,7 @@ const GameManager: React.FC = () => {
     }
   });
 
-///////////////////////////////// GAME STATE MUTATIONS //////////////////////////////////////
+  ///////////////////////////////// GAME STATE MUTATIONS //////////////////////////////////////
 
   // STARTING A NEW ROUND
   const startNewRound = liveblocksMutation(({ storage, setMyPresence }) => {
@@ -229,6 +230,27 @@ const GameManager: React.FC = () => {
       updatePresence({ currentAction: "waiting" });
     }
   }, [gameState, whiteCardsInHand, whiteCardsPerPlayer, updatePresence]);
+
+  // SET JUDGING STATE WHEN ALL PLAYERS HAVE PICKED
+  const setJudging = liveblocksMutation(
+    async ({ storage, self, setMyPresence }) => {
+      storage.get("CAH").set("activeState", "waiting for judge");
+      const isTurn = self.presence.CAHturn;
+      if (isTurn) {
+        console.log("I am judge");
+        setMyPresence({ currentAction: "judging" });
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (gameState === "waiting for players") {
+      if (cardsInRound?.length === connectedPlayers.length - 1) {
+        setJudging();
+      }
+    }
+  }, [cardsInRound, connectedPlayers, setJudging, gameState]);
 
   return <></>;
 };
