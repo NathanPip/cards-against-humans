@@ -27,7 +27,7 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
         ?.filter((hand) => hand.playerId === id)[0];
       if (hand === undefined) throw new Error("No winning hand found");
       storage.get("CAH").set("cardsInRound", [hand]);
-      broadcast({ type: "judge", data: { id, card: currentBlackCard.toObject() } } as never);
+      broadcast({ type: "judge", data: { id, card: currentBlackCard } } as never);
       setMyPresence({ currentAction: "waiting" });
     },
     []

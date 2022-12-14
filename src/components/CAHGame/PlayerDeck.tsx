@@ -1,5 +1,4 @@
-import { LiveList } from "@liveblocks/client";
-import { type MouseEvent, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import {
   useSelf,
   useMutation as liveblocksMutation,
@@ -7,6 +6,7 @@ import {
   useUpdateMyPresence,
   useBroadcastEvent
 } from "../../liveblocks.config";
+import CardDeck from "./CardDeck";
 import WhiteCard from "./WhiteCard";
 
 const PlayerDeck: React.FC = () => {
@@ -60,7 +60,7 @@ const PlayerDeck: React.FC = () => {
       if (currentPlayerDrawing === selfId) {
         updatePresence({ currentAction: "drawing" });
         const hand = whiteCards.slice(
-          currentCardIndex - whiteCardsPerPlayer - 1,
+          currentCardIndex - whiteCardsPerPlayer,
           currentCardIndex
         );
         console.log(hand);
@@ -98,9 +98,10 @@ const PlayerDeck: React.FC = () => {
   return (
     <div className="p-4 bg-green-300">
       {hand &&
-        hand.map((card) => (
-          <WhiteCard card={card} type="hand" setHand={setHand} key={card.id}/>
+        hand.map((card, index) => (
+          <WhiteCard card={card} type="hand" setHand={setHand} key={card.id + index*Math.random()}/>
         ))}
+        {hand && <CardDeck setHand={setHand}/>}
     </div>
   );
 };

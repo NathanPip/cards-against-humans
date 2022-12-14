@@ -25,7 +25,7 @@ const FormOptionsInputsParser = z.object({
   blackCards: z.array(CardDataType),
 });
 
-const ConnectedPlayersParser = z.array(z.string()).nonempty();
+const ConnectedPlayersParser = z.string().array().nonempty();
 
 const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   const pointsToWinInput = useRef<HTMLInputElement>(null);
@@ -46,21 +46,20 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
         pointsToWin: parsedOptions.pointsToWin,
         whiteCardsPerPlayer: parsedOptions.whiteCardsPerPlayer,
       });
-      const whiteCards = new LiveList(parsedOptions.whiteCards);
-      const blackCards = new LiveList(parsedOptions.blackCards);
       const parsedPlayers = ConnectedPlayersParser.parse(players);
-      const playersList = new LiveList(parsedPlayers);
+      const currentBlackCard = parsedOptions.blackCards[parsedOptions.blackCards.length - 1];
+      if(!currentBlackCard) throw new Error("No black cards found");
       console.log(storage.get("CAH"));
       storage.get("CAH").set("options", obj);
-      storage.get("CAH").set("whiteCards", whiteCards);
-      storage.get("CAH").set("blackCards", blackCards);
-      storage.get("CAH").set("connectedPlayers", playersList);
+      storage.get("CAH").set("whiteCards", parsedOptions.whiteCards);
+      storage.get("CAH").set("blackCards", parsedOptions.blackCards);
+      storage.get("CAH").set("connectedPlayers", parsedPlayers);
       storage
         .get("CAH")
         .set("currentWhiteCardIndex", parsedOptions.whiteCards.length);
       storage
         .get("CAH")
-        .set("currentBlackCard", new LiveObject(parsedOptions.blackCards[parsedOptions.blackCards.length - 1]));
+        .set("currentBlackCard", currentBlackCard);
       storage.get("CAH").set("currentPlayerDrawing", parsedPlayers[0]);
       storage
         .get("CAH")

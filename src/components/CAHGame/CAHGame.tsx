@@ -16,6 +16,7 @@ const CAHGame: React.FC = () => {
     storage.set("currentGame", null);
     storage.get("CAH").set("currentPlayerDrawing", undefined);
     storage.get("CAH").set("cardsInRound", []);
+    storage.get("CAH").set("currentPlayerTurn", undefined)
     broadcast({type: "game action", action: "end game"} as never)
     setMyPresence({ CAHturn: false });
     setMyPresence({ CAHBlackCardIds: [] });
