@@ -9,7 +9,6 @@ import {
   useStorage,
   useBroadcastEvent,
 } from "../../liveblocks.config";
-import { type Card } from "../../types/game";
 
 const GameManager: React.FC = () => {
   const id = useSelf((me) => me.id);
@@ -19,7 +18,7 @@ const GameManager: React.FC = () => {
   const othersDrawing = useOthersMapped(
     (others) => others.presence.currentAction
   );
-  const CAHCardsPicked = useSelf((me) => me.presence.CAHCardsPicked);
+  const cardsInRound = useStorage((root) => root.CAH.cardsInRound);
   const gameState = useStorage((root) => root.CAH.activeState);
   const currentBlackCard = useStorage((root) => root.CAH.currentBlackCard);
   const currentPlayerTurn = useStorage((root) => root.CAH.currentPlayerTurn);
@@ -29,56 +28,20 @@ const GameManager: React.FC = () => {
   const whiteCardsPerPlayer = useStorage(
     (root) => root.CAH.options.whiteCardsPerPlayer
   );
-
+  const othersActions = useOthersMapped(
+    (others) => others.presence.currentAction
+  );
   const currentPlayerDrawing = useStorage(
     (root) => root.CAH.currentPlayerDrawing
   );
-
-  const startNewRound = liveblocksMutation(({ storage, setMyPresence }) => {
-    const currentPlayer = storage.get("CAH").get("currentPlayerTurn");
-    const players = storage.get("CAH").get("connectedPlayers");
-    if (!currentPlayer) throw new Error("No current player");
-    const index = players.indexOf(currentPlayer);
-    const nextPlayerIndex = index + 1 > players.length - 1 ? 0 : index + 1;
-    const nextPlayer = players[nextPlayerIndex];
-
-    const currentBlackCard = storage.get("CAH").get("currentBlackCard");
-    const blackCards = storage.get("CAH").get("blackCards");
-    const blackCardIndex = blackCards.indexOf(currentBlackCard);
-    const nextBlackCardIndex =
-      blackCardIndex + 1 > blackCards.length - 1 ? 0 : blackCardIndex + 1;
-    const nextBlackCard = blackCards[nextBlackCardIndex];
-    if (!nextBlackCard) throw new Error("No next black card found");
-    storage.get("CAH").set("currentBlackCard", nextBlackCard);
-    storage.get("CAH").set("currentPlayerTurn", nextPlayer);
-    storage.get("CAH").set("cardsInRound", []);
-    storage.get("CAH").set("activeState", "waiting for players");
-
-    setMyPresence({ CAHCardsPicked: []})
-
-    if (id !== nextPlayer) {
-      console.log("notTurn");
-      setMyPresence({ currentAction: "selecting" });
-      setMyPresence({ CAHturn: false });
-    } else {
-      console.log("isTurn");
-      setMyPresence({ currentAction: "waiting" });
-      setMyPresence({ CAHturn: true });
-    }
-    broadcast({ type: "game action", action: "start game" } as never);
-  }, []);
-
-  const setWhiteCardsToPick = liveblocksMutation(({ storage }, num: number) => {
-    storage.get("CAH").set("whiteCardsToPick", num);
-  }, []);
 
   // LIVEBLOCKS EVENT LISTENER
   useEventListener(({ event }) => {
     // GAME STATE EVENTS
     if (event.type === "game action") {
       if (event.action === "start game") {
-        console.log(id);
-        console.log(currentPlayerTurn);
+        console.log("my id is", id);
+        console.log("current player turn is", currentPlayerTurn);
         if (id !== currentPlayerTurn) {
           console.log("notTurn");
           updatePresence({ currentAction: "selecting" });
@@ -116,24 +79,106 @@ const GameManager: React.FC = () => {
     }
   });
 
-  // START GAME ONCE PLAYERS HAVE DRAWN
-  const startGame = liveblocksMutation(
-    async ({ storage, setMyPresence }) => {
-      const currentTurn = storage.get("CAH").get("currentPlayerTurn");
-      if (id !== currentTurn) {
-        console.log("notTurn");
-        setMyPresence({ currentAction: "selecting" });
-        updatePresence({ CAHturn: false });
-      } else {
-        console.log("isTurn");
-        setMyPresence({ currentAction: "waiting" });
-        setMyPresence({ CAHturn: true });
+  const startNewRound = liveblocksMutation(({ storage, setMyPresence }) => {
+    const currentPlayer = storage.get("CAH").get("currentPlayerTurn");
+    const players = storage.get("CAH").get("connectedPlayers");
+    if (!currentPlayer) throw new Error("No current player");
+    const index = players.indexOf(currentPlayer);
+    const nextPlayerIndex = index + 1 > players.length - 1 ? 0 : index + 1;
+    const nextPlayer = players[nextPlayerIndex];
+
+    const currentBlackCard = storage.get("CAH").get("currentBlackCard");
+    const blackCards = storage.get("CAH").get("blackCards");
+    const blackCardIndex = blackCards.indexOf(currentBlackCard);
+    const nextBlackCardIndex =
+      blackCardIndex + 1 > blackCards.length - 1 ? 0 : blackCardIndex + 1;
+    const nextBlackCard = blackCards[nextBlackCardIndex];
+    if (!nextBlackCard) throw new Error("No next black card found");
+    storage.get("CAH").set("currentBlackCard", nextBlackCard);
+    storage.get("CAH").set("currentPlayerTurn", nextPlayer);
+    storage.get("CAH").set("cardsInRound", []);
+    storage.get("CAH").set("activeState", "starting round");
+
+    setMyPresence({ CAHCardsPicked: [] });
+
+    console.log("my id is", id);
+    console.log("current player turn is", nextPlayer);
+
+    if (id !== nextPlayer) {
+      console.log("notTurn");
+      setMyPresence({ currentAction: "selecting" });
+      setMyPresence({ CAHturn: false });
+    } else {
+      console.log("isTurn");
+      setMyPresence({ currentAction: "waiting" });
+      setMyPresence({ CAHturn: true });
+    }
+  }, []);
+
+  const setRoundStart = liveblocksMutation(({ storage }) => {
+    storage.get("CAH").set("activeState", "waiting for players");
+  }, []);
+
+  useEffect(() => {
+    if (gameState === "starting round" && isHost) {
+      let allReady = true;
+      othersActions.forEach((other) => {
+        // if any other player is still waiting for data, don't start new round
+        if (other[1] !== "ready to start") {
+          allReady = false;
+        }
+      });
+      if (allReady) {
+        broadcast({ type: "game action", action: "start game" } as never);
+        setRoundStart();
       }
-      storage.get("CAH").set("activeState", "waiting for players");
-      broadcast({ type: "game action", action: "start game" } as never);
-    },
-    []
-  );
+    }
+  }, [gameState, isHost, othersActions, broadcast, setRoundStart]);
+
+  useEffect(() => {
+    if (
+      gameState === "starting round" &&
+      !isHost &&
+      cardsInRound?.length === 0
+    ) {
+      updatePresence({ currentAction: "ready to start" });
+    }
+  }, [gameState, isHost, cardsInRound, updatePresence]);
+
+  // TRIGGER RESTART ROUND
+  useEffect(() => {
+    if (isHost && gameState === "ending round") {
+      let allDrawn = true;
+      othersDrawing.forEach((other) => {
+        // if any other player is still drawing, don't start new round
+        console.log(other[1]);
+        if (other[1] === "drawing" || actionState === "drawing") {
+          allDrawn = false;
+        }
+      });
+      console.log(allDrawn);
+      if (allDrawn) {
+        startNewRound();
+        // broadcast({ type: "game action", action: "start game" } as never);
+      }
+    }
+  }, [gameState, othersDrawing, isHost, startNewRound, broadcast, actionState]);
+
+  // START GAME ONCE PLAYERS HAVE DRAWN
+  const startGame = liveblocksMutation(async ({ storage, setMyPresence }) => {
+    const currentTurn = storage.get("CAH").get("currentPlayerTurn");
+    if (id !== currentTurn) {
+      console.log("notTurn");
+      setMyPresence({ currentAction: "selecting" });
+      updatePresence({ CAHturn: false });
+    } else {
+      console.log("isTurn");
+      setMyPresence({ currentAction: "waiting" });
+      setMyPresence({ CAHturn: true });
+    }
+    storage.get("CAH").set("activeState", "waiting for players");
+    broadcast({ type: "game action", action: "start game" } as never);
+  }, []);
 
   useEffect(() => {
     if (
@@ -145,26 +190,12 @@ const GameManager: React.FC = () => {
     }
   }, [isHost, currentPlayerDrawing, gameState, startGame, broadcast]);
 
-  // TRIGGER RESTART ROUND
-  useEffect(() => {
-    if (isHost && gameState === "ending round") {
-      let allDrawn = true;
-      othersDrawing.forEach((other) => {
-        // if any other player is still drawing, don't start new round
-        console.log(other[1])
-        if (other[1] === "drawing" || actionState === "drawing") {
-          allDrawn = false;
-        }
-      });
-      console.log(allDrawn)
-      if (allDrawn) {
-        startNewRound();
-        // broadcast({ type: "game action", action: "start game" } as never);
-      }
-    }
-  }, [gameState, othersDrawing, isHost, startNewRound, broadcast, actionState]);
-
   // SET AMOUNT OF WHITE CARDS TO PICK
+
+  const setWhiteCardsToPick = liveblocksMutation(({ storage }, num: number) => {
+    storage.get("CAH").set("whiteCardsToPick", num);
+  }, []);
+
   useEffect(() => {
     if (currentBlackCard && isHost) {
       const whiteCardAmt = currentBlackCard.text.split("_").length - 1;
@@ -177,7 +208,7 @@ const GameManager: React.FC = () => {
     if (gameState === "dealing whites") return;
     if (actionState !== "drawing") return;
     if (!whiteCardsInHand || !whiteCardsPerPlayer) return;
-    console.log(whiteCardsInHand.length >= whiteCardsPerPlayer)
+    console.log(whiteCardsInHand.length >= whiteCardsPerPlayer);
     if (whiteCardsInHand.length >= whiteCardsPerPlayer) {
       updatePresence({ currentAction: "waiting" });
     }

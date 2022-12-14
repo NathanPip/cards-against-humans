@@ -1,7 +1,6 @@
 import {
-  BaseUserMeta,
+  type BaseUserMeta,
   createClient,
-  type LiveList,
   type LiveObject,
 } from "@liveblocks/client";
 import { createRoomContext } from "@liveblocks/react";
@@ -36,7 +35,7 @@ export type Storage = {
     currentWhiteCardIndex: number | undefined;
     currentBlackCard: Card;
     whiteCardsToPick: number | undefined;
-    connectedPlayers: LiveList<string>;
+    connectedPlayers: string[];
     currentPlayerDrawing: string | undefined;
     currentPlayerTurn: string | undefined;
     activeState:
@@ -45,6 +44,7 @@ export type Storage = {
       | "waiting for judge"
       | "starting game"
       | "ending round"
+      | "starting round"
       | "ending game";
   }>;
 };
