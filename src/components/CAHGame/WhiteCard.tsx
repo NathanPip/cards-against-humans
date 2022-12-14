@@ -54,7 +54,6 @@ const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type }) => {
     },
     []
   );
-
   const cardClickHandler = () => {
     if (!card) return; //Error
     console.log(

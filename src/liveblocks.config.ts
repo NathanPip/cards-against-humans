@@ -1,4 +1,5 @@
 import {
+  BaseUserMeta,
   createClient,
   type LiveList,
   type LiveObject,
@@ -28,11 +29,12 @@ export type Storage = {
   currentGame: null | "Cards Against Humanity";
   CAH: LiveObject<{
     options: CAHGameOptions;
-    whiteCards: LiveList<{id: string, text: string}>;
-    blackCards: LiveList<{id: string, text: string}>;
+    whiteCards: Card[];
+    blackCards: Card[];
     cardsInRound: {cards: Required<Card>[], playerId: string}[] | undefined;
+    playerHands: Record<string, Card[]>;
     currentWhiteCardIndex: number | undefined;
-    currentBlackCard: LiveObject<{id: string, text: string}>;
+    currentBlackCard: Card;
     whiteCardsToPick: number | undefined;
     connectedPlayers: LiveList<string>;
     currentPlayerDrawing: string | undefined;
@@ -47,6 +49,10 @@ export type Storage = {
   }>;
 };
 
+type UserMetaData = {name?: string} & BaseUserMeta;
+
+type RoomEvents = { type: "game action" | "judge" } & {action?: string, data?: {id: string, card: Card}};
+
 export const {
   suspense: {
     RoomProvider,
@@ -59,4 +65,4 @@ export const {
     useBroadcastEvent,
     useEventListener
   },
-} = createRoomContext<Presence, Storage>(client);
+} = createRoomContext<Presence, Storage, UserMetaData, RoomEvents >(client);
