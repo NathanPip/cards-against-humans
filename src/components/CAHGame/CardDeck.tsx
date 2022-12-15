@@ -21,7 +21,7 @@ const CardDeck: React.FC = () => {
     const deck = storage.get("CAH").get("whiteCards");
     const currentCard = storage.get("CAH").get("currentWhiteCardIndex");
     if (!currentCard) throw new Error("No current card found while drawing");
-    const index = currentCard + 1 >= deck.length ? 0 : currentCard + 1;
+    const index = currentCard - 1 < 0 ? deck.length-1 : currentCard - 1;
     setNewCardIndex(index)
     const nextCard = deck[index];
     if (!nextCard)

@@ -17,15 +17,16 @@ type WhiteCardProps = {
     | undefined;
   setRevealedAmt?: React.Dispatch<React.SetStateAction<number>>;
   type: "hand" | "round";
+  isRevealed?: boolean;
 };
 
-const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type, setRevealedAmt }) => {
+const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type, setRevealedAmt, isRevealed }) => {
   const isTurn = useSelf((me) => me.presence.CAHturn);
   const actionState = useSelf((me) => me.presence.currentAction);
   const gameState = useStorage((root) => root.CAH.activeState);
   const selfId = useSelf((me) => me.id);
   const cardsRevealed = useSelf((me) => me.presence.CAHCardsRevealed);
-  const [revealed, setRevealed] = useState(type === "hand" ? true : false);
+  const [revealed, setRevealed] = useState(type === "hand" || isRevealed ? true : false);
 
   const broadcast = useBroadcastEvent();
 

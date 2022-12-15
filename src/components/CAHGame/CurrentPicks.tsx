@@ -4,7 +4,7 @@ const CurrentPicks: React.FC = () => {
   const cardsInRound = useStorage((root) => root.CAH.cardsInRound);
 
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-4 my-2">
       {cardsInRound &&
         cardsInRound.map((cards) => (
           <div key={cards.playerId} className="flex">

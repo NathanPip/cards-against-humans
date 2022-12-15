@@ -6,7 +6,7 @@ import {
 } from "../../liveblocks.config";
 import PickedHand from "./PickedHand";
 
-const CardsInRound: React.FC = () => {
+const RevealShowcase: React.FC = () => {
   const cardsInRound = useStorage((root) => root.CAH.cardsInRound);
   const [handsRevealed, setHandsRevealed] = useState(0);
   const animationAmt = useMemo(() => {
@@ -14,15 +14,16 @@ const CardsInRound: React.FC = () => {
     const amt = (handsRevealed * .5) * 100;
     return `${amt}%`;
   }, [handsRevealed])
-  const gameState = useStorage((root) => root.CAH.activeState);
   const handsRevealedStorage = useStorage((root) => root.CAH.handsRevealed);
+
+  console.log(animationAmt);
 
   useEffect(() => {
     setHandsRevealed(handsRevealedStorage)
   }, [handsRevealedStorage, setHandsRevealed])
 
   return (
-    <div className={`my-4 gap-4 flex self-start -translate-x-[${animationAmt}] ${gameState === "waiting for judge" ? "justify-center w-full" : ""}`}>
+    <div style={{transform: `translateX(-${animationAmt})`}} className={`my-4 gap-4 flex self-start`}>
         {cardsInRound &&
           cardsInRound.map((cards) => (
             <PickedHand key={cards.playerId} hand={cards} />
@@ -31,4 +32,4 @@ const CardsInRound: React.FC = () => {
   );
 };
 
-export default CardsInRound;
+export default RevealShowcase;
