@@ -6,8 +6,7 @@ import {
   useUpdateMyPresence,
   useBroadcastEvent
 } from "../../liveblocks.config";
-import { Card } from "../../types/game";
-import CardDeck from "./CardDeck";
+import { type Card } from "../../types/game";
 import WhiteCard from "./WhiteCard";
 
 const PlayerDeck: React.FC = () => {

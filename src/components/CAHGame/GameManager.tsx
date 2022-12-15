@@ -23,10 +23,6 @@ const GameManager: React.FC = () => {
   const currentPlayerTurn = useStorage((root) => root.CAH.currentPlayerTurn);
   const broadcast = useBroadcastEvent();
   const actionState = useSelf((me) => me.presence.currentAction);
-  const whiteCardsInHand = useSelf((me) => me.presence.CAHWhiteCardIds);
-  const whiteCardsPerPlayer = useStorage(
-    (root) => root.CAH.options.whiteCardsPerPlayer
-  );
   const othersActions = useOthersMapped(
     (others) => others.presence.currentAction
   );

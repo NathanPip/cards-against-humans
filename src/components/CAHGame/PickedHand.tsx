@@ -1,4 +1,3 @@
-import { LiveList } from "@liveblocks/client";
 import { type Card } from "../../types/game";
 import WhiteCard from "./WhiteCard";
 import {
