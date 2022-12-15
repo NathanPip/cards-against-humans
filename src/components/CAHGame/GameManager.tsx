@@ -57,6 +57,7 @@ const GameManager: React.FC = () => {
           updatePresence({ CAHturn: true });
         }
         updatePresence({ CAHCardsPicked: [] });
+        updatePresence({ CAHCardsRevealed: 0 });
       }
 
       if (event.action === "end game") {
@@ -64,6 +65,7 @@ const GameManager: React.FC = () => {
         updatePresence({ CAHturn: false });
         updatePresence({ CAHBlackCardIds: [] });
         updatePresence({ CAHCardsPicked: [] });
+        updatePresence({ CAHCardsRevealed: 0 });
       }
     }
 
@@ -115,6 +117,7 @@ const GameManager: React.FC = () => {
 
     // since host is the only client who can run function, update host presence based on new data
     setMyPresence({ CAHCardsPicked: [] });
+    setMyPresence({ CAHCardsRevealed: 0 });
 
     console.log("my id is", id);
     console.log("current player turn is", nextPlayer);
