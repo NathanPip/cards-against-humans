@@ -4,6 +4,7 @@ import {
   useMutation as liveblocksMutation,
   useBroadcastEvent,
 } from "../../liveblocks.config";
+import CardDeck from "./CardDeck";
 import GameArea from "./GameArea";
 import GameManager from "./GameManager";
 import PlayerDeck from "./PlayerDeck";
@@ -33,6 +34,7 @@ const CAHGame: React.FC = () => {
       <GameManager />
       <GameArea />
       <PlayerDeck />
+      <CardDeck />
     </div>
   );
 };

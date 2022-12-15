@@ -86,10 +86,10 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
 
   return (
     <div onClick={handClickHandler} className={`${gameState !== "waiting for judge" ? "w-screen" : ""} gap-2 flex flex-col items-center`}>
+      <button onClick={nextClickHandler} className={`${!canMove || clicked ? "hidden" : ""} text-white text-xl`}>Next Hand</button>
       {hand.cards.map((card) => {
         return <WhiteCard key={card.id} card={card} type="round" setRevealedAmt={setNumRevealed} />;
       })}
-      <button onClick={nextClickHandler} className={`${!canMove || clicked ? "hidden" : ""} absolute text-black`}>Next</button>
     </div>
   );
 };

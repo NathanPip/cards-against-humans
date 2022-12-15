@@ -24,6 +24,8 @@ const PlayerDeck: React.FC = () => {
 
   const broadcast = useBroadcastEvent();
 
+  const isTurn = useSelf((me) => me.presence.CAHturn);
+
   const selfId = useSelf((me) => me.id);
 
   const gameState = useStorage((root) => root.CAH.activeState);
@@ -106,15 +108,16 @@ const PlayerDeck: React.FC = () => {
       updatePresence({ CAHWhiteCardIds: hand.map((card) => card.id) });
   }, [hand, updatePresence])
 
-  return (
-    <div className="p-4 bg-green-300 max-w-full flex gap-4 absolute h-1/3 bottom-0 left-1/2 -translate-x-1/2 overflow-x-scroll overflow-y-visible">
+  if(gameState !== "judge revealing" && gameState !== "waiting for judge" && !isTurn) return (
+    <div className="p-4 max-w-full flex gap-4 absolute h-1/3 bottom-0 left-1/2 -translate-x-1/2 overflow-x-scroll overflow-y-visible">
       {hand &&
         hand.map((card, index) => (
           <WhiteCard card={card} type="hand" setHand={setHand} key={card.id + index*Math.random()}/>
         ))}
-        {hand && <CardDeck setHand={setHand}/>}
+        {/* {hand && <CardDeck />} */}
     </div>
   );
+  return null;
 };
 
 export default PlayerDeck;
