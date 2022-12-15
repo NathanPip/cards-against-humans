@@ -1,4 +1,3 @@
-import { LiveList } from "@liveblocks/client";
 import {
   useSelf,
   useMutation as liveblocksMutation,
@@ -33,8 +32,8 @@ const CAHGame: React.FC = () => {
       {isHost && <button onClick={endGame}>exit</button>}
       <GameManager />
       <GameArea />
-      <PlayerDeck />
       <CardDeck />
+      <PlayerDeck />
     </div>
   );
 };

@@ -17,7 +17,12 @@ const CardDeck: React.FC = () => {
     storage.get("CAH").set("currentWhiteCardIndex", index)
   }, [])
 
-  const pickCard = liveblocksMutation(({ storage }) => {
+  const pickCard = liveblocksMutation(({ storage, self, setMyPresence }) => {
+    const currentWhiteCards = self.presence.CAHWhiteCardIds || []; 
+    const whiteCardsPerPlayer = storage.get("CAH").get("options").get("whiteCardsPerPlayer");
+    if(currentWhiteCards.length+1 >= whiteCardsPerPlayer) {
+      setMyPresence({currentAction: "waiting"});
+    }
     const deck = storage.get("CAH").get("whiteCards");
     const currentCard = storage.get("CAH").get("currentWhiteCardIndex");
     if (!currentCard) throw new Error("No current card found while drawing");

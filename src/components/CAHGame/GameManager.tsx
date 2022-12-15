@@ -1,6 +1,4 @@
-import { type LiveObject } from "@liveblocks/client";
-import { createContext, useEffect } from "react";
-import { isGeneratorFunction } from "util/types";
+import { useEffect } from "react";
 import {
   useEventListener,
   useOthersMapped,
@@ -19,10 +17,8 @@ const GameManager: React.FC = () => {
   const othersDrawing = useOthersMapped(
     (others) => others.presence.currentAction
   );
-  const isTurn = useSelf((me) => me.presence.CAHturn);
   const cardsInRound = useStorage((root) => root.CAH.cardsInRound);
   const gameState = useStorage((root) => root.CAH.activeState);
-  const cardsRevealed = useSelf(me => me.presence.CAHCardsRevealed)
   const currentBlackCard = useStorage((root) => root.CAH.currentBlackCard);
   const currentPlayerTurn = useStorage((root) => root.CAH.currentPlayerTurn);
   const broadcast = useBroadcastEvent();
@@ -227,17 +223,6 @@ const GameManager: React.FC = () => {
       setWhiteCardsToPick(whiteCardAmt);
     }
   }, [currentBlackCard, setWhiteCardsToPick, isHost]);
-
-  // STOP DRAWING ONCE ALL CARDS HAVE BEEN PICKED
-  useEffect(() => {
-    if (gameState === "dealing whites") return;
-    if (actionState !== "drawing") return;
-    if (!whiteCardsInHand || !whiteCardsPerPlayer) return;
-    console.log(whiteCardsInHand.length >= whiteCardsPerPlayer);
-    if (whiteCardsInHand.length >= whiteCardsPerPlayer) {
-      updatePresence({ currentAction: "waiting" });
-    }
-  }, [gameState, whiteCardsInHand, whiteCardsPerPlayer, updatePresence]);
 
   // SET JUDGING STATE WHEN ALL PLAYERS HAVE PICKED
   const setRevealing = liveblocksMutation(

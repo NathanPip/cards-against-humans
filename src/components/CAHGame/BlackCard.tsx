@@ -1,14 +1,11 @@
-import { type Card } from "../../types/game"
+import { useStorage } from "../../liveblocks.config";
 
-type BlackCardProps = {
-    card: Card;
-}
-
-const BlackCard: React.FC<BlackCardProps> = ({card}) => {
+const BlackCard: React.FC = ({}) => {
+    const card = useStorage((root) => root.CAH.currentBlackCard);
 
     return (
     <div className="bg-black h-72 w-fit max-w-sm rounded-lg py-2 px-4">
-        <p className="text-xl w-48">{card.text}</p>
+        {card && <p className="text-xl w-48">{card.text}</p>}
     </div>)
 }
 
