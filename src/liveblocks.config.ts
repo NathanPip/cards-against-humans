@@ -14,12 +14,13 @@ export type Presence = {
   name: string;
   score?: number;
   isHost?: boolean;
-  currentAction: "waiting" | "drawing" | "judging" | "selecting";
+  currentAction: "waiting" | "drawing" | "judging" | "selecting" | "ready to start" | "revealing";
   CAHWhiteCardIds?: string[];
   CAHBlackCardIds?: string[];
   CAHturn?: boolean;
   CAHCardsPicked?: (Required<Card>)[];
   CAHCardsToPick?: number;
+  CAHCardsRevealed?: number;
 };
 
 export type Storage = {
@@ -42,6 +43,7 @@ export type Storage = {
       "dealing whites"
       | "waiting for players"
       | "waiting for judge"
+      | "judge revealing"
       | "starting game"
       | "ending round"
       | "starting round"

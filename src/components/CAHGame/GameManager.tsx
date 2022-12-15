@@ -1,5 +1,6 @@
 import { type LiveObject } from "@liveblocks/client";
 import { createContext, useEffect } from "react";
+import { isGeneratorFunction } from "util/types";
 import {
   useEventListener,
   useOthersMapped,
@@ -18,8 +19,10 @@ const GameManager: React.FC = () => {
   const othersDrawing = useOthersMapped(
     (others) => others.presence.currentAction
   );
+  const isTurn = useSelf((me) => me.presence.CAHturn);
   const cardsInRound = useStorage((root) => root.CAH.cardsInRound);
   const gameState = useStorage((root) => root.CAH.activeState);
+  const cardsRevealed = useSelf(me => me.presence.CAHCardsRevealed)
   const currentBlackCard = useStorage((root) => root.CAH.currentBlackCard);
   const currentPlayerTurn = useStorage((root) => root.CAH.currentPlayerTurn);
   const broadcast = useBroadcastEvent();
@@ -244,13 +247,37 @@ const GameManager: React.FC = () => {
     []
   );
 
+  const setRevealing = liveblocksMutation(
+    async ({ storage, self, setMyPresence }) => {
+      storage.get("CAH").set("activeState", "judge revealing");
+      const isTurn = self.presence.CAHturn;
+      if (isTurn) {
+        console.log("I am judge");
+        setMyPresence({ currentAction: "revealing" });
+      }
+    },
+    []
+  );
   useEffect(() => {
-    if (gameState === "waiting for players") {
-      if (cardsInRound?.length === connectedPlayers.length - 1) {
+    if(gameState === "judge revealing" && isTurn) {
+      if(cardsRevealed === undefined) throw new Error("no cards revealed number in presence")
+      let numCards = 0;
+      cardsInRound?.forEach((card) => {
+        numCards += card.cards.length;
+      });
+      if(cardsRevealed >= numCards) {
         setJudging();
       }
     }
-  }, [cardsInRound, connectedPlayers, setJudging, gameState]);
+  }, [cardsInRound, cardsRevealed, setJudging, gameState, isTurn])
+
+  useEffect(() => {
+    if (gameState === "waiting for players") {
+      if (cardsInRound?.length === connectedPlayers.length - 1) {
+        setRevealing();
+      }
+    }
+  }, [cardsInRound, connectedPlayers, setRevealing, gameState]);
 
   return <></>;
 };

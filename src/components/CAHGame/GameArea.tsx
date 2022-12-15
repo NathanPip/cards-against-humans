@@ -11,7 +11,7 @@ const GameArea: React.FC = () => {
     return (
     <div className="py-4 flex flex-col justify-center items-center max-w-full overflow-x-hidden">
         {currentBlackCard && <BlackCard card={currentBlackCard}/>}
-        {gameState === "waiting for judge" || gameState === "ending round" ? <CardsInRound /> : <CurrentPicks/>}
+        {gameState === "waiting for judge" || gameState === "ending round" || gameState === "judge revealing" ? <CardsInRound /> : <CurrentPicks/>}
     </div>
     )
 }
