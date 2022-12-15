@@ -27,7 +27,8 @@ const CardDeck: React.FC<CardDeckProps> = ({ setHand }) => {
     const nextCard = deck[index];
     if (!nextCard || !setHand)
       throw new Error("No next card found while drawing");
-    setHand((prev) => (prev ? [...prev, nextCard] : [nextCard]));
+    // setHand((prev) => (prev ? [...prev, nextCard] : [nextCard]));
+    window.dispatchEvent(new CustomEvent("card picked", { detail: { card: nextCard } }))
   }, []);
 
   return (
@@ -37,8 +38,8 @@ const CardDeck: React.FC<CardDeckProps> = ({ setHand }) => {
           ? pickCard()
           : null
       }
-      className="bg-red-400 px-12 py-36"
-    ></div>
+      className="fixed bg-white shadow-lg text-black top-0 left-0"
+    >Pick New Card</div>
   );
 };
 
