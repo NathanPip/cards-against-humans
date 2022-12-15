@@ -22,6 +22,7 @@ const CAHGame: React.FC = () => {
     setMyPresence({ CAHBlackCardIds: [] });
     setMyPresence({ CAHWhiteCardIds: [] });
     setMyPresence({ CAHCardsPicked: [] });
+    setMyPresence({ CAHCardsRevealed: 0 });
   }, []);
   const isHost = useSelf((me) => me.presence.isHost);
   
