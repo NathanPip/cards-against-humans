@@ -10,18 +10,26 @@ import {
 import { useEffect, useState } from "react";
 
 type PickedHandProps = {
-  hand: { readonly cards: readonly Readonly<Required<Card>>[]; readonly playerId: string };
+  hand:
+    | {
+        readonly cards: readonly Readonly<Required<Card>>[];
+        readonly playerId: string;
+      }
+    | { cards: Required<Card>[]; playerId: string };
+  isJudgingHand?: boolean;
 };
 
-const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
+const PickedHand: React.FC<PickedHandProps> = ({ hand, isJudgingHand }) => {
   const gameState = useStorage((root) => root.CAH.activeState);
   const isTurn = useSelf((me) => me.presence.CAHturn);
   const broadcast = useBroadcastEvent();
   const [numRevealed, setNumRevealed] = useState(0);
   const [canMove, setCanMove] = useState(false);
-  const [clicked, setClicked] = useState(false);
+  const [clicked, setClicked] = useState(isJudgingHand !== undefined ? isJudgingHand : false);
   const handsRevealed = useStorage((root) => root.CAH.handsRevealed);
-  const connectedPlayersLength = useStorage((root) => root.CAH.connectedPlayers.length);
+  const connectedPlayersLength = useStorage(
+    (root) => root.CAH.connectedPlayers.length
+  );
 
   const chooseWinner = liveblocksMutation(
     async ({ storage, setMyPresence }, id: string) => {
@@ -33,7 +41,10 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
         ?.filter((hand) => hand.playerId === id)[0];
       if (hand === undefined) throw new Error("No winning hand found");
       storage.get("CAH").set("cardsInRound", [hand]);
-      broadcast({ type: "judge", data: { id, card: currentBlackCard } } as never);
+      broadcast({
+        type: "judge",
+        data: { id, card: currentBlackCard },
+      } as never);
       setMyPresence({ currentAction: "waiting" });
     },
     []
@@ -52,12 +63,11 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
     []
   );
 
-  const incrementHandsRevealedAmt = liveblocksMutation(
-    async ({ storage } ) => {
-      const handsRevealed = storage.get("CAH").get("handsRevealed");
-      storage.get("CAH").set("handsRevealed", handsRevealed + 1);
-    }, []
-  )
+  const incrementHandsRevealedAmt = liveblocksMutation(async ({ storage }) => {
+    const handsRevealed = storage.get("CAH").get("handsRevealed");
+    console.log(handsRevealed);
+    storage.get("CAH").set("handsRevealed", handsRevealed + 1);
+  }, []);
 
   const handClickHandler = () => {
     if (gameState === "waiting for judge" && isTurn) {
@@ -67,28 +77,47 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
 
   const nextClickHandler = () => {
     if (gameState === "judge revealing" && isTurn && !clicked) {
-      if(handsRevealed === connectedPlayersLength - 2) {
+      if (handsRevealed === connectedPlayersLength - 2) {
         setJudging();
         setClicked(true);
         return;
       }
       console.log("clicked");
-      incrementHandsRevealedAmt()
+      incrementHandsRevealedAmt();
+      broadcast({ type: "next card", id: hand.playerId });
       setClicked(true);
-    } 
-  }
+    }
+  };
   console.log(gameState);
   useEffect(() => {
     if (numRevealed === hand.cards.length) {
       setCanMove(true);
     }
-  }, [numRevealed, setCanMove, hand.cards.length])
+  }, [numRevealed, setCanMove, hand.cards.length]);
 
   return (
-    <div onClick={handClickHandler} className={`${gameState !== "waiting for judge" ? "w-screen" : ""} gap-2 flex flex-col items-center`}>
-      <button onClick={nextClickHandler} className={`${!canMove || clicked ? "hidden" : ""} text-white text-xl`}>Next Hand</button>
+    <div
+      onClick={handClickHandler}
+      className={`${
+        gameState !== "waiting for judge" ? "w-screen" : ""
+      } flex flex-col items-center gap-2`}
+    >
+      <button
+        onClick={nextClickHandler}
+        className={`${!canMove || clicked ? "hidden" : ""} text-xl text-white`}
+      >
+        Next Hand
+      </button>
       {hand.cards.map((card) => {
-        return <WhiteCard key={card.id} card={card} type="round" setRevealedAmt={setNumRevealed} />;
+        return (
+          <WhiteCard
+            key={card.id}
+            card={card}
+            type="round"
+            isRevealed={isJudgingHand}
+            setRevealedAmt={setNumRevealed}
+          />
+        );
       })}
     </div>
   );
