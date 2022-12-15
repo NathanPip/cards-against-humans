@@ -14,12 +14,13 @@ export type Presence = {
   name: string;
   score?: number;
   isHost?: boolean;
-  currentAction: "waiting" | "drawing" | "judging" | "selecting";
+  currentAction: "waiting" | "drawing" | "judging" | "selecting" | "ready to start" | "revealing";
   CAHWhiteCardIds?: string[];
   CAHBlackCardIds?: string[];
   CAHturn?: boolean;
   CAHCardsPicked?: (Required<Card>)[];
   CAHCardsToPick?: number;
+  CAHCardsRevealed?: number;
 };
 
 export type Storage = {
@@ -32,6 +33,7 @@ export type Storage = {
     blackCards: Card[];
     cardsInRound: {cards: Required<Card>[], playerId: string}[] | undefined;
     playerHands: Record<string, Card[]>;
+    handsRevealed: number;
     currentWhiteCardIndex: number | undefined;
     currentBlackCard: Card;
     whiteCardsToPick: number | undefined;
@@ -42,6 +44,7 @@ export type Storage = {
       "dealing whites"
       | "waiting for players"
       | "waiting for judge"
+      | "judge revealing"
       | "starting game"
       | "ending round"
       | "starting round"
@@ -51,7 +54,7 @@ export type Storage = {
 
 type UserMetaData = {name?: string} & BaseUserMeta;
 
-type RoomEvents = { type: "game action" | "judge" } & {action?: string, data?: {id: string, card: Card}};
+type RoomEvents = { type: "game action" | "judge" | "card revealed" } & {action?: string, data?: {id: string, card: Card}, id?: string};
 
 export const {
   suspense: {

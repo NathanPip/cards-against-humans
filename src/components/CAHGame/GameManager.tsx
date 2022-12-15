@@ -1,5 +1,6 @@
 import { type LiveObject } from "@liveblocks/client";
 import { createContext, useEffect } from "react";
+import { isGeneratorFunction } from "util/types";
 import {
   useEventListener,
   useOthersMapped,
@@ -18,8 +19,10 @@ const GameManager: React.FC = () => {
   const othersDrawing = useOthersMapped(
     (others) => others.presence.currentAction
   );
+  const isTurn = useSelf((me) => me.presence.CAHturn);
   const cardsInRound = useStorage((root) => root.CAH.cardsInRound);
   const gameState = useStorage((root) => root.CAH.activeState);
+  const cardsRevealed = useSelf(me => me.presence.CAHCardsRevealed)
   const currentBlackCard = useStorage((root) => root.CAH.currentBlackCard);
   const currentPlayerTurn = useStorage((root) => root.CAH.currentPlayerTurn);
   const broadcast = useBroadcastEvent();
@@ -34,6 +37,7 @@ const GameManager: React.FC = () => {
   const currentPlayerDrawing = useStorage(
     (root) => root.CAH.currentPlayerDrawing
   );
+  const connectedPlayers = useStorage((root) => root.CAH.connectedPlayers);
 
   ///////////////////////////////// EVENT LISTENER //////////////////////////////////////
 
@@ -53,6 +57,7 @@ const GameManager: React.FC = () => {
           updatePresence({ CAHturn: true });
         }
         updatePresence({ CAHCardsPicked: [] });
+        updatePresence({ CAHCardsRevealed: 0 });
       }
 
       if (event.action === "end game") {
@@ -60,6 +65,7 @@ const GameManager: React.FC = () => {
         updatePresence({ CAHturn: false });
         updatePresence({ CAHBlackCardIds: [] });
         updatePresence({ CAHCardsPicked: [] });
+        updatePresence({ CAHCardsRevealed: 0 });
       }
     }
 
@@ -80,7 +86,7 @@ const GameManager: React.FC = () => {
     }
   });
 
-///////////////////////////////// GAME STATE MUTATIONS //////////////////////////////////////
+  ///////////////////////////////// GAME STATE MUTATIONS //////////////////////////////////////
 
   // STARTING A NEW ROUND
   const startNewRound = liveblocksMutation(({ storage, setMyPresence }) => {
@@ -105,12 +111,14 @@ const GameManager: React.FC = () => {
 
     // reset round data
     storage.get("CAH").set("cardsInRound", []);
+    storage.get("CAH").set("handsRevealed", 0);
 
     // set game state to starting round
     storage.get("CAH").set("activeState", "starting round");
 
     // since host is the only client who can run function, update host presence based on new data
     setMyPresence({ CAHCardsPicked: [] });
+    setMyPresence({ CAHCardsRevealed: 0 });
 
     console.log("my id is", id);
     console.log("current player turn is", nextPlayer);
@@ -193,6 +201,7 @@ const GameManager: React.FC = () => {
       setMyPresence({ CAHturn: true });
     }
     storage.get("CAH").set("activeState", "waiting for players");
+    storage.get("CAH").set("handsRevealed", 0);
     broadcast({ type: "game action", action: "start game" } as never);
   }, []);
 
@@ -229,6 +238,41 @@ const GameManager: React.FC = () => {
       updatePresence({ currentAction: "waiting" });
     }
   }, [gameState, whiteCardsInHand, whiteCardsPerPlayer, updatePresence]);
+
+  // SET JUDGING STATE WHEN ALL PLAYERS HAVE PICKED
+
+
+  const setRevealing = liveblocksMutation(
+    async ({ storage, self, setMyPresence }) => {
+      storage.get("CAH").set("activeState", "judge revealing");
+      const isTurn = self.presence.CAHturn;
+      if (isTurn) {
+        console.log("I am judge");
+        setMyPresence({ currentAction: "revealing" });
+      }
+    },
+    []
+  );
+  // useEffect(() => {
+  //   if(gameState === "judge revealing" && isTurn) {
+  //     if(cardsRevealed === undefined) throw new Error("no cards revealed number in presence")
+  //     let numCards = 0;
+  //     cardsInRound?.forEach((card) => {
+  //       numCards += card.cards.length;
+  //     });
+  //     if(cardsRevealed >= numCards) {
+  //       setJudging();
+  //     }
+  //   }
+  // }, [cardsInRound, cardsRevealed, setJudging, gameState, isTurn])
+
+  useEffect(() => {
+    if (gameState === "waiting for players") {
+      if (cardsInRound?.length === connectedPlayers.length - 1) {
+        setRevealing();
+      }
+    }
+  }, [cardsInRound, connectedPlayers, setRevealing, gameState]);
 
   return <></>;
 };

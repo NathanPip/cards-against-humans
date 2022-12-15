@@ -5,6 +5,8 @@ import {
   useStorage,
   useMutation as liveblocksMutation,
   useBroadcastEvent,
+  useUpdateMyPresence,
+  useEventListener,
 } from "../../liveblocks.config";
 import { type Card } from "../../types/game";
 
@@ -13,17 +15,29 @@ type WhiteCardProps = {
   setHand?:
     | React.Dispatch<React.SetStateAction<Card[] | undefined>>
     | undefined;
+  setRevealedAmt?: React.Dispatch<React.SetStateAction<number>>;
   type: "hand" | "round";
 };
 
-const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type }) => {
+const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type, setRevealedAmt }) => {
   const isTurn = useSelf((me) => me.presence.CAHturn);
   const actionState = useSelf((me) => me.presence.currentAction);
   const gameState = useStorage((root) => root.CAH.activeState);
   const selfId = useSelf((me) => me.id);
+  const cardsRevealed = useSelf((me) => me.presence.CAHCardsRevealed);
   const [revealed, setRevealed] = useState(type === "hand" ? true : false);
 
   const broadcast = useBroadcastEvent();
+
+  const updatePresence = useUpdateMyPresence();
+
+  useEventListener(({event}) => {
+    if(event.type === "card revealed") {
+      if(event.id === card.id) {
+        setRevealed(true);
+      }
+    }
+  })
 
   const selectCard = liveblocksMutation(
     async ({ storage, setMyPresence, self }, card: Card) => {
@@ -73,18 +87,25 @@ const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type }) => {
       selectCard(card);
     } else if (
       type === "round" &&
-      isTurn &&
-      gameState === "waiting for judge"
+      isTurn
     ) {
-      if (!card.playerId) throw new Error("No player id attached to card");
-      setRevealed(true);
+      if(gameState === "waiting for judge"){
+        if (!card.playerId) throw new Error("No player id attached to card");
+      } else if( gameState === "judge revealing" && !revealed){
+        if(cardsRevealed === undefined) throw new Error("No cards revealed amount found");
+        if(!setRevealedAmt) throw new Error("No setRevealedAmt function found");
+        setRevealed(true);
+        setRevealedAmt(prev => prev+1);
+        broadcast({type: "card revealed", id: card.id})
+        updatePresence({CAHCardsRevealed: cardsRevealed + 1});
+      }
     }
     console.log("completed");
   };
 
   return (
-    <div>
-      <p onClick={cardClickHandler}>{card.text}</p>
+    <div onClick={cardClickHandler} className={`w-fit px-4 py-2 h-full bg-white rounded-lg ${type === "round" && "h-52"}`}>
+      <p className={`text-black w-48 text-xl`}>{revealed ? card.text : "reveal card"}</p>
     </div>
   );
 };

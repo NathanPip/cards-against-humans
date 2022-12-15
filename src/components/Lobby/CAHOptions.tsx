@@ -68,6 +68,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
           parsedPlayers[Math.floor(Math.random() * parsedPlayers.length)]
         );
       storage.get("CAH").set("activeState", "starting game");
+      storage.get("CAH").set("handsRevealed", 0);
     },
     []
   );

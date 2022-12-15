@@ -3,13 +3,12 @@ import {
   useMutation as liveblocksMutation,
   useSelf,
 } from "../../liveblocks.config";
-import { type Card } from "../../types/game";
 
-type CardDeckProps = {
-  setHand: React.Dispatch<React.SetStateAction<Card[] | undefined>> | undefined;
-};
+// type CardDeckProps = {
+//   setHand: React.Dispatch<React.SetStateAction<Card[] | undefined>> | undefined;
+// };
 
-const CardDeck: React.FC<CardDeckProps> = ({ setHand }) => {
+const CardDeck: React.FC = () => {
   const actionState = useSelf((me) => me.presence.currentAction);
 
   const gameState = useStorage((root) => root.CAH.activeState);
@@ -25,21 +24,24 @@ const CardDeck: React.FC<CardDeckProps> = ({ setHand }) => {
     const index = currentCard + 1 >= deck.length ? 0 : currentCard + 1;
     setNewCardIndex(index)
     const nextCard = deck[index];
-    if (!nextCard || !setHand)
+    if (!nextCard)
       throw new Error("No next card found while drawing");
-    setHand((prev) => (prev ? [...prev, nextCard] : [nextCard]));
+    // setHand((prev) => (prev ? [...prev, nextCard] : [nextCard]));
+    window.dispatchEvent(new CustomEvent("card picked", { detail: { card: nextCard } }))
   }, []);
 
-  return (
+  if(actionState === "drawing") return (
     <div
       onClick={() =>
         actionState === "drawing" && gameState !== "dealing whites"
           ? pickCard()
           : null
       }
-      className="bg-red-400 px-12 py-36"
-    ></div>
+      className="fixed bg-white text-xl rounded-md p-6 m-2 shadow-lg text-black bottom-1/3 left-0"
+    >Pick New Card</div>
   );
+
+  return null;
 };
 
 export default CardDeck;

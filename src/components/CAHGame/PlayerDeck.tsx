@@ -6,6 +6,7 @@ import {
   useUpdateMyPresence,
   useBroadcastEvent
 } from "../../liveblocks.config";
+import { Card } from "../../types/game";
 import CardDeck from "./CardDeck";
 import WhiteCard from "./WhiteCard";
 
@@ -22,6 +23,8 @@ const PlayerDeck: React.FC = () => {
   );
 
   const broadcast = useBroadcastEvent();
+
+  const isTurn = useSelf((me) => me.presence.CAHturn);
 
   const selfId = useSelf((me) => me.id);
 
@@ -45,7 +48,7 @@ const PlayerDeck: React.FC = () => {
     storage.get("CAH").set("activeState", "dealing whites");
   }, []);
 
-  // Initial Draw BE CAREFUL
+  // Initial Draw BE CAREFUL ** CHECKS FAIL AFTER FIRST FULL RUN THROUGH SO DON'T WORRY TOO MUCH **
   useEffect(() => {
     if (
       !selfId ||
@@ -91,19 +94,30 @@ const PlayerDeck: React.FC = () => {
   ]);
 
   useEffect(() => {
+    const handler = (e: unknown) => {
+      const card = (e as CustomEvent).detail as {card: Card};
+      console.log(card);
+      setHand(prev => prev ? [...prev, card.card] : [card.card]);
+    }
+    window.addEventListener("card picked", handler);
+    return () => window.removeEventListener("card picked", handler);
+  }, [setHand])
+
+  useEffect(() => {
     if(!hand) return;
       updatePresence({ CAHWhiteCardIds: hand.map((card) => card.id) });
   }, [hand, updatePresence])
 
-  return (
-    <div className="p-4 bg-green-300">
+  if(gameState !== "judge revealing" && gameState !== "waiting for judge" && !isTurn) return (
+    <div className="p-4 max-w-full flex gap-4 absolute h-1/3 bottom-0 left-1/2 -translate-x-1/2 overflow-x-scroll overflow-y-visible">
       {hand &&
         hand.map((card, index) => (
           <WhiteCard card={card} type="hand" setHand={setHand} key={card.id + index*Math.random()}/>
         ))}
-        {hand && <CardDeck setHand={setHand}/>}
+        {/* {hand && <CardDeck />} */}
     </div>
   );
+  return null;
 };
 
 export default PlayerDeck;
