@@ -111,6 +111,7 @@ const GameManager: React.FC = () => {
 
     // reset round data
     storage.get("CAH").set("cardsInRound", []);
+    storage.get("CAH").set("handsRevealed", 0);
 
     // set game state to starting round
     storage.get("CAH").set("activeState", "starting round");
@@ -200,6 +201,7 @@ const GameManager: React.FC = () => {
       setMyPresence({ CAHturn: true });
     }
     storage.get("CAH").set("activeState", "waiting for players");
+    storage.get("CAH").set("handsRevealed", 0);
     broadcast({ type: "game action", action: "start game" } as never);
   }, []);
 

@@ -33,6 +33,7 @@ export type Storage = {
     blackCards: Card[];
     cardsInRound: {cards: Required<Card>[], playerId: string}[] | undefined;
     playerHands: Record<string, Card[]>;
+    handsRevealed: number;
     currentWhiteCardIndex: number | undefined;
     currentBlackCard: Card;
     whiteCardsToPick: number | undefined;
@@ -53,7 +54,7 @@ export type Storage = {
 
 type UserMetaData = {name?: string} & BaseUserMeta;
 
-type RoomEvents = { type: "game action" | "judge" } & {action?: string, data?: {id: string, card: Card}};
+type RoomEvents = { type: "game action" | "judge" | "card revealed" } & {action?: string, data?: {id: string, card: Card}, id?: string};
 
 export const {
   suspense: {

@@ -11,10 +11,9 @@ import { useEffect, useState } from "react";
 
 type PickedHandProps = {
   hand: { readonly cards: readonly Readonly<Required<Card>>[]; readonly playerId: string };
-  setHandsRevealed: React.Dispatch<React.SetStateAction<number>>;
 };
 
-const PickedHand: React.FC<PickedHandProps> = ({ hand, setHandsRevealed }) => {
+const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
   const gameState = useStorage((root) => root.CAH.activeState);
   const isTurn = useSelf((me) => me.presence.CAHturn);
   const broadcast = useBroadcastEvent();
@@ -38,6 +37,13 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand, setHandsRevealed }) => {
     []
   );
 
+  const incrementHandsRevealedAmt = liveblocksMutation(
+    async ({ storage } ) => {
+      const handsRevealed = storage.get("CAH").get("handsRevealed");
+      storage.get("CAH").set("handsRevealed", handsRevealed + 1);
+    }, []
+  )
+
   const handClickHandler = () => {
     if (gameState === "waiting for judge" && isTurn) {
       chooseWinner(hand.playerId);
@@ -47,7 +53,7 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand, setHandsRevealed }) => {
   const nextClickHandler = () => {
     if (gameState === "judge revealing" && isTurn && !clicked) {
       console.log("clicked");
-      setHandsRevealed(prev => prev + 1);
+      incrementHandsRevealedAmt()
       setClicked(true);
     }
   }

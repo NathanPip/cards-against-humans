@@ -14,12 +14,17 @@ const CardsInRound: React.FC = () => {
     const amt = (handsRevealed * .5) * 100;
     return `${amt}%`;
   }, [handsRevealed])
+  const handsRevealedStorage = useStorage((root) => root.CAH.handsRevealed);
+
+  useEffect(() => {
+    setHandsRevealed(handsRevealedStorage)
+  }, [handsRevealedStorage, setHandsRevealed])
 
   return (
     <div className={`my-4 gap-4 flex self-start -translate-x-[${animationAmt}]`}>
         {cardsInRound &&
           cardsInRound.map((cards) => (
-            <PickedHand key={cards.playerId} hand={cards} setHandsRevealed={setHandsRevealed} />
+            <PickedHand key={cards.playerId} hand={cards} />
           ))}
     </div>
   );
