@@ -240,17 +240,7 @@ const GameManager: React.FC = () => {
   }, [gameState, whiteCardsInHand, whiteCardsPerPlayer, updatePresence]);
 
   // SET JUDGING STATE WHEN ALL PLAYERS HAVE PICKED
-  const setJudging = liveblocksMutation(
-    async ({ storage, self, setMyPresence }) => {
-      storage.get("CAH").set("activeState", "waiting for judge");
-      const isTurn = self.presence.CAHturn;
-      if (isTurn) {
-        console.log("I am judge");
-        setMyPresence({ currentAction: "judging" });
-      }
-    },
-    []
-  );
+
 
   const setRevealing = liveblocksMutation(
     async ({ storage, self, setMyPresence }) => {
@@ -263,18 +253,18 @@ const GameManager: React.FC = () => {
     },
     []
   );
-  useEffect(() => {
-    if(gameState === "judge revealing" && isTurn) {
-      if(cardsRevealed === undefined) throw new Error("no cards revealed number in presence")
-      let numCards = 0;
-      cardsInRound?.forEach((card) => {
-        numCards += card.cards.length;
-      });
-      if(cardsRevealed >= numCards) {
-        setJudging();
-      }
-    }
-  }, [cardsInRound, cardsRevealed, setJudging, gameState, isTurn])
+  // useEffect(() => {
+  //   if(gameState === "judge revealing" && isTurn) {
+  //     if(cardsRevealed === undefined) throw new Error("no cards revealed number in presence")
+  //     let numCards = 0;
+  //     cardsInRound?.forEach((card) => {
+  //       numCards += card.cards.length;
+  //     });
+  //     if(cardsRevealed >= numCards) {
+  //       setJudging();
+  //     }
+  //   }
+  // }, [cardsInRound, cardsRevealed, setJudging, gameState, isTurn])
 
   useEffect(() => {
     if (gameState === "waiting for players") {

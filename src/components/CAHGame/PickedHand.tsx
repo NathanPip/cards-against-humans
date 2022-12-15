@@ -20,6 +20,8 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
   const [numRevealed, setNumRevealed] = useState(0);
   const [canMove, setCanMove] = useState(false);
   const [clicked, setClicked] = useState(false);
+  const handsRevealed = useStorage((root) => root.CAH.handsRevealed);
+  const connectedPlayersLength = useStorage((root) => root.CAH.connectedPlayers.length);
 
   const chooseWinner = liveblocksMutation(
     async ({ storage, setMyPresence }, id: string) => {
@@ -33,6 +35,19 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
       storage.get("CAH").set("cardsInRound", [hand]);
       broadcast({ type: "judge", data: { id, card: currentBlackCard } } as never);
       setMyPresence({ currentAction: "waiting" });
+    },
+    []
+  );
+
+  const setJudging = liveblocksMutation(
+    async ({ storage, self, setMyPresence }) => {
+      storage.get("CAH").set("activeState", "waiting for judge");
+      storage.get("CAH").set("handsRevealed", 0);
+      const isTurn = self.presence.CAHturn;
+      if (isTurn) {
+        console.log("I am judge");
+        setMyPresence({ currentAction: "judging" });
+      }
     },
     []
   );
@@ -52,12 +67,17 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
 
   const nextClickHandler = () => {
     if (gameState === "judge revealing" && isTurn && !clicked) {
+      if(handsRevealed === connectedPlayersLength - 2) {
+        setJudging();
+        setClicked(true);
+        return;
+      }
       console.log("clicked");
       incrementHandsRevealedAmt()
       setClicked(true);
-    }
+    } 
   }
-
+  console.log(gameState);
   useEffect(() => {
     if (numRevealed === hand.cards.length) {
       setCanMove(true);
@@ -65,11 +85,11 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand }) => {
   }, [numRevealed, setCanMove, hand.cards.length])
 
   return (
-    <div onClick={handClickHandler} className="w-screen gap-2 flex flex-col items-center">
+    <div onClick={handClickHandler} className={`${gameState !== "waiting for judge" ? "w-screen" : ""} gap-2 flex flex-col items-center`}>
       {hand.cards.map((card) => {
         return <WhiteCard key={card.id} card={card} type="round" setRevealedAmt={setNumRevealed} />;
       })}
-      <button onClick={nextClickHandler} className={`${!canMove ? "hidden" : ""} absolute text-black`}>Next</button>
+      <button onClick={nextClickHandler} className={`${!canMove || clicked ? "hidden" : ""} absolute text-black`}>Next</button>
     </div>
   );
 };

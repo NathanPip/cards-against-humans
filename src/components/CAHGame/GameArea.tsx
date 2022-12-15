@@ -5,7 +5,6 @@ import CardsInRound from "./CardsInRound";
 import CurrentPicks from "./CurrentPicks";
 
 const GameArea: React.FC = () => {
-
     const currentBlackCard = useStorage((root) => root.CAH.currentBlackCard);
     const gameState = useStorage((root) => root.CAH.activeState);
 

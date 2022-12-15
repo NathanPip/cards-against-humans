@@ -14,6 +14,7 @@ const CardsInRound: React.FC = () => {
     const amt = (handsRevealed * .5) * 100;
     return `${amt}%`;
   }, [handsRevealed])
+  const gameState = useStorage((root) => root.CAH.activeState);
   const handsRevealedStorage = useStorage((root) => root.CAH.handsRevealed);
 
   useEffect(() => {
@@ -21,7 +22,7 @@ const CardsInRound: React.FC = () => {
   }, [handsRevealedStorage, setHandsRevealed])
 
   return (
-    <div className={`my-4 gap-4 flex self-start -translate-x-[${animationAmt}]`}>
+    <div className={`my-4 gap-4 flex self-start -translate-x-[${animationAmt}] ${gameState === "waiting for judge" ? "justify-center w-full" : ""}`}>
         {cardsInRound &&
           cardsInRound.map((cards) => (
             <PickedHand key={cards.playerId} hand={cards} />
