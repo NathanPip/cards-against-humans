@@ -112,7 +112,7 @@ const PlayerDeck: React.FC = () => {
       {hand &&
         hand.map((card, index) => (
           <WhiteCard card={card} type="hand" setHand={setHand} key={card.id + index*Math.random()}/>
-        ))}
+        )).reverse()}
         {/* {hand && <CardDeck />} */}
     </div>
   );

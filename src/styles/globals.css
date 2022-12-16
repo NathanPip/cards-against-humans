@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 body {
-  background: linear-gradient(90deg, #2e026d, #15162c);
-  color: white;
+  background: rgb(120,120,120);
+  background: linear-gradient(90deg, rgba(120,120,120,1) 0%, rgba(237,237,237,1) 100%);
+  color: black;
 }
 
 #packs::-webkit-scrollbar {
