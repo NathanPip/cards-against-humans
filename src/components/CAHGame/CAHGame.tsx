@@ -6,6 +6,7 @@ import {
 import CardDeck from "./CardDeck";
 import GameArea from "./GameArea";
 import GameManager from "./GameManager";
+import JudgesLounge from "./JudgesLounge";
 import PlayerDeck from "./PlayerDeck";
 
 const CAHGame: React.FC = () => {
@@ -32,6 +33,7 @@ const CAHGame: React.FC = () => {
       {isHost && <button onClick={endGame}>exit</button>}
       <GameManager />
       <GameArea />
+      <JudgesLounge />
       <CardDeck />
       <PlayerDeck />
     </div>

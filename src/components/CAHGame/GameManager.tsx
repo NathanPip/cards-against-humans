@@ -233,13 +233,19 @@ const GameManager: React.FC = () => {
     []
   );
 
+  const setPlayersReady = liveblocksMutation(
+    async ({ storage, self, setMyPresence }) => {
+      storage.get("CAH").set("activeState", "players picked");},
+      []
+  )
+
   useEffect(() => {
     if (gameState === "waiting for players") {
       if (cardsInRound?.length === connectedPlayers.length - 1) {
-        setRevealing();
+        setPlayersReady();
       }
     }
-  }, [cardsInRound, connectedPlayers, setRevealing, gameState]);
+  }, [cardsInRound, connectedPlayers, setPlayersReady, gameState]);
 
   return <></>;
 };
