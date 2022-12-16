@@ -1,5 +1,4 @@
-import { LiveList, LiveObject } from "@liveblocks/client";
-import { type CAHBlackCard, type CAHWhiteCard } from "@prisma/client";
+import { LiveObject } from "@liveblocks/client";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useContext, useRef, useState } from "react";
 import { z } from "zod";
@@ -47,8 +46,9 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
         whiteCardsPerPlayer: parsedOptions.whiteCardsPerPlayer,
       });
       const parsedPlayers = ConnectedPlayersParser.parse(players);
-      const currentBlackCard = parsedOptions.blackCards[parsedOptions.blackCards.length - 1];
-      if(!currentBlackCard) throw new Error("No black cards found");
+      const currentBlackCard =
+        parsedOptions.blackCards[parsedOptions.blackCards.length - 1];
+      if (!currentBlackCard) throw new Error("No black cards found");
       console.log(storage.get("CAH"));
       storage.get("CAH").set("options", obj);
       storage.get("CAH").set("whiteCards", parsedOptions.whiteCards);
@@ -57,9 +57,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
       storage
         .get("CAH")
         .set("currentWhiteCardIndex", parsedOptions.whiteCards.length);
-      storage
-        .get("CAH")
-        .set("currentBlackCard", currentBlackCard);
+      storage.get("CAH").set("currentBlackCard", currentBlackCard);
       storage.get("CAH").set("currentPlayerDrawing", parsedPlayers[0]);
       storage
         .get("CAH")
@@ -166,11 +164,11 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
             >
               <div className=" flex flex-col">
                 {data.cardPacks.map((pack) => (
-                  <>
+                  <div key={pack.id}>
                     <label htmlFor={pack.name} key={pack.id + "label"}>
                       {pack.name}
                     </label>
-                    <div className=" relative bottom-5   mr-3 inline flex justify-end">
+                    <div className=" relative bottom-5   mr-3 flex justify-end">
                       <input
                         type="checkbox"
                         key={pack.id}
@@ -178,7 +176,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
                         value={pack.id}
                       />
                     </div>
-                  </>
+                  </div>
                 ))}
               </div>
             </fieldset>
