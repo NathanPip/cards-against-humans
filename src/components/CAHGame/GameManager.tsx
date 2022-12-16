@@ -17,6 +17,7 @@ const GameManager: React.FC = () => {
   const othersDrawing = useOthersMapped(
     (others) => others.presence.currentAction
   );
+  const isTurn = useSelf((me) => me.presence.CAHturn);
   const cardsInRound = useStorage((root) => root.CAH.cardsInRound);
   const gameState = useStorage((root) => root.CAH.activeState);
   const currentBlackCard = useStorage((root) => root.CAH.currentBlackCard);
@@ -108,7 +109,7 @@ const GameManager: React.FC = () => {
     // set game state to starting round
     storage.get("CAH").set("activeState", "starting round");
 
-    // since host is the only client who can run function, update host presence based on new data
+    // since person whos turn ran function is the only client who can run function, update their presence based on new data
     setMyPresence({ CAHCardsPicked: [] });
     setMyPresence({ CAHCardsRevealed: 0 });
 
@@ -131,6 +132,14 @@ const GameManager: React.FC = () => {
     storage.get("CAH").set("activeState", "waiting for players");
   }, []);
 
+  const setReadyToStartRound = liveblocksMutation(({ storage }) => {
+    storage.get("CAH").set("activeState", "ready to start round");
+  }, []);
+
+  const setWaitingForPlayersToDraw = liveblocksMutation(({ storage }) => {
+    storage.get("CAH").set("activeState", "waiting for players to draw");
+  }, []);
+
   // if host, check if all players are ready to start new round, and if so, start new round
   useEffect(() => {
     if (gameState === "starting round" && isHost) {
@@ -142,7 +151,7 @@ const GameManager: React.FC = () => {
         }
       });
       if (allReady) {
-        broadcast({ type: "game action", action: "start game" } as never);
+        broadcast({ type: "game action", action: "start game" });
         setRoundStart();
       }
     }
@@ -159,9 +168,27 @@ const GameManager: React.FC = () => {
     }
   }, [gameState, isHost, cardsInRound, updatePresence]);
 
-  // triggers a restart round if all players have drawn and round has ended
   useEffect(() => {
-    if (isHost && gameState === "ending round") {
+    if(!isHost) return;
+    const handler = () => {
+        startNewRound();
+    }
+    window.addEventListener("start round", handler)
+    return () => window.removeEventListener("start round", handler)
+  }, [isHost, startNewRound])
+
+  useEventListener(({event}) => {
+    if(!isHost) return;
+    if(event.type === "judge") {
+      if(event.action === "start round") {
+        startNewRound();
+      }
+    }
+  });
+
+  // triggers ready for restart round if all players have drawn and round has ended
+  useEffect(() => {
+    if (isHost && (gameState === "ending round" || gameState === "waiting for players to draw")) {
       let allDrawn = true;
       othersDrawing.forEach((other) => {
         // if any other player is still drawing, don't start new round
@@ -172,11 +199,12 @@ const GameManager: React.FC = () => {
       });
       console.log(allDrawn);
       if (allDrawn) {
-        startNewRound();
-        // broadcast({ type: "game action", action: "start game" } as never);
+        setReadyToStartRound();
+      } else {
+        setWaitingForPlayersToDraw();
       }
     }
-  }, [gameState, othersDrawing, isHost, startNewRound, broadcast, actionState]);
+  }, [gameState, othersDrawing, isHost, setReadyToStartRound, setWaitingForPlayersToDraw, broadcast, actionState]);
 
   /////////////////////////////// GAME START //////////////////////////////////////
 
@@ -221,17 +249,6 @@ const GameManager: React.FC = () => {
   }, [currentBlackCard, setWhiteCardsToPick, isHost]);
 
   // SET JUDGING STATE WHEN ALL PLAYERS HAVE PICKED
-  const setRevealing = liveblocksMutation(
-    async ({ storage, self, setMyPresence }) => {
-      storage.get("CAH").set("activeState", "judge revealing");
-      const isTurn = self.presence.CAHturn;
-      if (isTurn) {
-        console.log("I am judge");
-        setMyPresence({ currentAction: "revealing" });
-      }
-    },
-    []
-  );
 
   const setPlayersReady = liveblocksMutation(
     async ({ storage, self, setMyPresence }) => {
