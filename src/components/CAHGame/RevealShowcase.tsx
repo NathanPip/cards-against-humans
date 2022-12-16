@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   useStorage,
-  useMutation as liveblocksMutation,
-  useSelf,
 } from "../../liveblocks.config";
 import PickedHand from "./PickedHand";
 

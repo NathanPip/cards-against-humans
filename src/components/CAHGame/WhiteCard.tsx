@@ -1,4 +1,3 @@
-import { LiveList, LiveObject } from "@liveblocks/client";
 import { useState } from "react";
 import {
   useSelf,
@@ -45,7 +44,6 @@ const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type, setRevealedA
       const cardsInRound = storage.get("CAH").get("cardsInRound") || [];
       if (selfId === undefined) throw new Error("No selfId");
       const cardsPicked = self.presence.CAHCardsPicked || [];
-      console.log(cardsPicked);
       const numCardsNeeded = storage.get("CAH").get("whiteCardsToPick");
       if (numCardsNeeded === undefined)
         throw new Error("No numCardsNeeded found");

@@ -42,11 +42,14 @@ export type Storage = {
     currentPlayerTurn: string | undefined;
     activeState:
       "dealing whites"
-      | "waiting for players"
-      | "waiting for judge"
-      | "judge revealing"
       | "starting game"
+      | "waiting for players"
+      | "players picked"
+      | "judge revealing"
+      | "waiting for judge"
       | "ending round"
+      | "waiting for players to draw"
+      | "ready to start round"
       | "starting round"
       | "ending game";
   }>;

@@ -6,8 +6,7 @@ import {
   useUpdateMyPresence,
   useBroadcastEvent
 } from "../../liveblocks.config";
-import { Card } from "../../types/game";
-import CardDeck from "./CardDeck";
+import { type Card } from "../../types/game";
 import WhiteCard from "./WhiteCard";
 
 const PlayerDeck: React.FC = () => {
@@ -113,7 +112,7 @@ const PlayerDeck: React.FC = () => {
       {hand &&
         hand.map((card, index) => (
           <WhiteCard card={card} type="hand" setHand={setHand} key={card.id + index*Math.random()}/>
-        ))}
+        )).reverse()}
         {/* {hand && <CardDeck />} */}
     </div>
   );
