@@ -32,8 +32,8 @@ const JudgesLoungeContent: React.FC = () => {
 
   if (gameState === "waiting for players")
     return (
-      <div>
-        <p>Waiting for players to pick cards...</p>
+      <div className="flex justify-center pb-4">
+        <p className="absolute top-12 ">Waiting for players to pick cards...</p>
       </div>
     );
 
