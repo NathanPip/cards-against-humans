@@ -103,7 +103,7 @@ const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type, setRevealedA
   };
 
   return (
-    <div onClick={cardClickHandler} className={`w-fit px-4 py-2 h-full bg-white rounded-lg ${type === "round" && "h-52"}`}>
+    <div onClick={cardClickHandler} className={`w-fit px-4 py-2 h-64 bg-white rounded-lg ${type === "round" && "h-52"}`}>
       <p className={`text-black w-48 text-xl`}>{revealed ? card.text : "reveal card"}</p>
     </div>
   );
