@@ -11,7 +11,7 @@ const CurrentPicks: React.FC = () => {
             {cards.cards.map((card) => (
               <div
                 key={card.id}
-                className={`ml-[calc(2rem*-1)] h-24 w-12 rounded-lg border border-solid border-zinc-800/40 bg-white shadow-lg first:ml-0`}
+                className={`ml-[calc(2rem*-1)] h-24 w-12 rounded-lg border border-solid border-zinc-800/40 bg-white  shadow-lg first:ml-0`}
               >
                 {" "}
               </div>

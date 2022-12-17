@@ -37,9 +37,9 @@ const CAHGame: React.FC = () => {
         </button>
       )}
       <GameManager />
+      <InfoPanel />
       <GameArea />
       <JudgesLounge />
-      <InfoPanel />
       <PlayerContainer />
     </div>
   );
