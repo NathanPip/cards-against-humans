@@ -57,7 +57,7 @@ export type Storage = {
 
 type UserMetaData = {name?: string} & BaseUserMeta;
 
-type RoomEvents = { type: "game action" | "judge" | "card revealed" | "next card" } & {action?: string, data?: {id: string, card: Card}, id?: string};
+type RoomEvents = { type: "game action" | "judge" | "card revealed" | "next card" | "player action" } & {action?: string, data?: {id: string, card: Card}, id?: string};
 
 export const {
   suspense: {
