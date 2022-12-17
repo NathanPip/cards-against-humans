@@ -9,12 +9,17 @@ const LobbyScreen: React.FC = () => {
   const others = useOthersMapped((other) => other.presence.name);
   const currentGame = useStorage((root) => root.currentGame);
 
-  if (currentGame) return <div className="h-screen w-full relative overflow-hidden"><CAHGame /></div>;
+  if (currentGame)
+    return (
+      <div className="relative h-screen w-full overflow-hidden">
+        <CAHGame />
+      </div>
+    );
 
   return (
     <>
       <h1 className="flex justify-center text-2xl">{title}</h1>
-      <p className="flex justify-end">{id}</p>
+      {/* <p className="flex justify-end">{id}</p> */}
       <div className="ml-9 h-48 w-48 rounded-2xl border-2 border-black bg-zinc-800/40">
         <h2 className="mt-4 flex w-48 justify-center ">Current Party</h2>
         {others.map((name) => (
