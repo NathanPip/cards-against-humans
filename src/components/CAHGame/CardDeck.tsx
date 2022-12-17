@@ -3,6 +3,8 @@ import {
   useStorage,
   useMutation as liveblocksMutation,
   useSelf,
+  useBroadcastEvent,
+  useEventListener,
 } from "../../liveblocks.config";
 
 const CardDeck: React.FC = () => {
@@ -10,11 +12,14 @@ const CardDeck: React.FC = () => {
 
   const gameState = useStorage((root) => root.CAH.activeState);
 
-  const [animated, setAnimated] = useState(false);
+  const [animateDraw, setAnimateDraw] = useState(false);
+  const [animateWiggle, setAnimateWiggle] = useState(true);
 
   const setNewCardIndex = liveblocksMutation(({ storage }, index) => {
     storage.get("CAH").set("currentWhiteCardIndex", index);
   }, []);
+
+  const broadcast = useBroadcastEvent();
 
   const pickCard = liveblocksMutation(({ storage, self, setMyPresence }) => {
     const currentWhiteCards = self.presence.CAHWhiteCardIds || [];
@@ -35,32 +40,45 @@ const CardDeck: React.FC = () => {
     window.dispatchEvent(
       new CustomEvent("card picked", { detail: { card: nextCard } })
     );
+    broadcast({ type: "player action", action: "picked card" });
   }, []);
 
-  if (
-    actionState === "drawing" ||
-    actionState === "selecting" ||
-    actionState === "waiting"
-  )
-    if (gameState !== "judge revealing" && gameState !== "waiting for judge")
+  useEventListener(({ event }) => {
+    if (event.type === "player action") {
+      if (event.action === "picked card") {
+           setAnimateDraw(true)
+      }
+    }
+  });
+
+  // if (
+  //   actionState === "drawing" ||
+  //   actionState === "selecting" ||
+  //   actionState === "waiting"
+  // )
+  //   if (gameState !== "judge revealing" && gameState !== "waiting for judge")
       return (
         <div
           onClick={() => {
             if (actionState === "drawing" && gameState !== "dealing whites") {
               pickCard();
-              setAnimated(true)
+              setAnimateDraw(true);
             }
           }}
-          className="fixed bottom-1/3 left-0 m-2 h-fit w-fit"
+          className="absolute top-0 mx-2 -my-28 h-fit w-fit"
         >
-          <p>{actionState === "drawing" && "draw a card"}</p>
+          <p className="ml-2 mb-4 font-semibold drop-shadow-md absolute w-max top-0 -my-10 ">{actionState === "drawing" && "draw a card"}</p>
           <div
             className={`absolute transition-transform ${
               actionState === "drawing"
-                ? "translate-x-1 rotate-6 hover:translate-x-2 hover:rotate-12"
+                ? `translate-x-1 rotate-6 hover:translate-x-2 hover:rotate-12 ${animateWiggle ? "animate-wiggle-card" : ""}`
                 : ""
-            } ${animated ? "animate-draw-card" : ""} h-20 w-12 rounded-md bg-white text-black shadow-lg`}
-            onAnimationEnd={() => setAnimated(false)}
+            } ${
+              animateDraw ? "animate-draw-card" : ""
+            } h-20 w-12 rounded-md bg-white text-black shadow-lg`}
+            onAnimationEnd={() => setAnimateDraw(false)}
+            onMouseEnter={() => setAnimateWiggle(false)}
+            onMouseLeave={() => setAnimateWiggle(true)}
           ></div>
           <div className=" h-20 w-12 rounded-md bg-white text-black shadow-lg "></div>
         </div>

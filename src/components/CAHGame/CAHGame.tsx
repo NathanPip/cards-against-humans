@@ -8,6 +8,7 @@ import GameArea from "./GameArea";
 import GameManager from "./GameManager";
 import InfoPanel from "./InfoPanel";
 import JudgesLounge from "./JudgesLounge";
+import PlayerContainer from "./PlayerContainer";
 import PlayerDeck from "./PlayerDeck";
 
 const CAHGame: React.FC = () => {
@@ -29,7 +30,7 @@ const CAHGame: React.FC = () => {
   const isHost = useSelf((me) => me.presence.isHost);
 
   return (
-    <div className="flex flex-col py-12">
+    <div className="flex flex-col overflow-y-scroll py-12">
       {isHost && (
         <button className="absolute top-0" onClick={endGame}>
           exit
@@ -39,8 +40,7 @@ const CAHGame: React.FC = () => {
       <GameArea />
       <JudgesLounge />
       <InfoPanel />
-      <CardDeck />
-      <PlayerDeck />
+      <PlayerContainer />
     </div>
   );
 };
