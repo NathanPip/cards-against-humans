@@ -95,7 +95,6 @@ const PlayerDeck: React.FC = () => {
   useEffect(() => {
     const handler = (e: unknown) => {
       const card = (e as CustomEvent).detail as {card: Card};
-      console.log(card);
       setHand(prev => prev ? [...prev, card.card] : [card.card]);
     }
     window.addEventListener("card picked", handler);
@@ -107,8 +106,8 @@ const PlayerDeck: React.FC = () => {
       updatePresence({ CAHWhiteCardIds: hand.map((card) => card.id) });
   }, [hand, updatePresence])
 
-  if(gameState !== "judge revealing" && gameState !== "waiting for judge" && !isTurn) return (
-    <div className="p-4 max-w-full flex gap-4 absolute h-1/3 bottom-0 left-1/2 -translate-x-1/2 overflow-x-scroll overflow-y-visible">
+  return (
+    <div className="p-4 flex gap-4 overflow-x-scroll overflow-y-visible">
       {hand &&
         hand.map((card, index) => (
           <WhiteCard card={card} type="hand" setHand={setHand} key={card.id + index*Math.random()}/>
@@ -116,7 +115,6 @@ const PlayerDeck: React.FC = () => {
         {/* {hand && <CardDeck />} */}
     </div>
   );
-  return null;
 };
 
 export default PlayerDeck;

@@ -153,6 +153,7 @@ const GameManager: React.FC = () => {
       if (allReady) {
         broadcast({ type: "game action", action: "start game" });
         setRoundStart();
+        window.dispatchEvent(new CustomEvent("start new game"));
       }
     }
   }, [gameState, isHost, othersActions, broadcast, setRoundStart]);
