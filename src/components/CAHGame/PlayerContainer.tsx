@@ -7,14 +7,6 @@ import ShowHandButton from "./ShowHandButton";
 const PlayerContainer: React.FC = () => {
   const [isShown, setIsShown] = useState(true);
 
-//   useEventListener(({event}) => {
-//     if(event.type === "game action") {
-//         if(event.action === "start game") {
-//             setIsShown(true);
-//         }
-//     }
-//   })
-
   return (
     <div
       className={`absolute bottom-0 w-full transition-transform ${

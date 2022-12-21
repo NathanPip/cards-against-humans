@@ -3,13 +3,11 @@ import {
   useMutation as liveblocksMutation,
   useBroadcastEvent,
 } from "../../liveblocks.config";
-import CardDeck from "./CardDeck";
 import GameArea from "./GameArea";
 import GameManager from "./GameManager";
 import InfoPanel from "./InfoPanel";
 import JudgesLounge from "./JudgesLounge";
 import PlayerContainer from "./PlayerContainer";
-import PlayerDeck from "./PlayerDeck";
 
 const CAHGame: React.FC = () => {
   const broadcast = useBroadcastEvent();
@@ -30,7 +28,7 @@ const CAHGame: React.FC = () => {
   const isHost = useSelf((me) => me.presence.isHost);
 
   return (
-    <div className="flex flex-col py-12 w-screen">
+    <div className="flex flex-col pt-4 w-screen">
       {isHost && (
         <button className="absolute top-0" onClick={endGame}>
           exit

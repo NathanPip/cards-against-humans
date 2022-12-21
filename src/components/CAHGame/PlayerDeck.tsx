@@ -22,9 +22,7 @@ const PlayerDeck: React.FC = () => {
   );
 
   const broadcast = useBroadcastEvent();
-
-  const isTurn = useSelf((me) => me.presence.CAHturn);
-
+  
   const selfId = useSelf((me) => me.id);
 
   const gameState = useStorage((root) => root.CAH.activeState);

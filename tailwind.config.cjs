@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
+  plugins: [require("tailwindcss-textshadow")],
   theme: {
     extend: {
       keyframes: {
@@ -12,13 +13,12 @@ module.exports = {
           "0%": { rotate: "0deg" },
           "50%": { rotate: "3deg", translate: ".25rem 0" },
           "100%": { rotate: "0deg" },
-        }
+        },
       },
       animation: {
         "draw-card": "card-draw 1s ease-in-out",
         "wiggle-card": "card-wiggle 1s ease-in-out .5s infinite",
-      }
+      },
     },
   },
-  plugins: [],
 };

@@ -67,7 +67,7 @@ const CardDeck: React.FC = () => {
           }}
           className="absolute top-0 mx-2 -my-28 h-fit w-fit"
         >
-          <p className="ml-2 mb-4 font-semibold drop-shadow-md absolute w-max top-0 -my-10 ">{actionState === "drawing" && "draw a card"}</p>
+          <p className="mb-4 font-semibold animate-bounce text-shadow-xl absolute w-max top-0 -my-10 ">{actionState === "drawing" && "draw a card"}</p>
           <div
             className={`absolute transition-transform ${
               actionState === "drawing"

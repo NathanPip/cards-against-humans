@@ -104,7 +104,7 @@ const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type, setRevealedA
 
   return (
     <div onClick={cardClickHandler} className={`w-fit px-4 py-2 h-64 transition-transform bg-white rounded-lg ${type === "round" && "h-52 w-40"} ${(type === "toReveal" && gameState === "judge revealing") && "scale-75 -my-4 -mx-6"}`}>
-      <p className={`text-black w-36 text-xl`}>{revealed ? card.text : ""}{isTurn && !revealed ? "click to reveal" : ""}</p>
+      <p className={`text-black w-40 text-xl`}>{revealed ? card.text : ""}{isTurn && !revealed ? "click to reveal" : ""}</p>
     </div>
   );
 };
