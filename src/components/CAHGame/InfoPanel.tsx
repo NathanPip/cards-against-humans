@@ -5,11 +5,9 @@ const InfoPanel: React.FC = () => {
 
     const isTurn = useSelf((me) => me.presence.CAHturn);
 
-    if(isTurn) return null;
-
     return (
-        <div>
-            <InfoPanelContent />
+        <div className="h-8">
+            {!isTurn ? <InfoPanelContent /> : null}
         </div>
     )
 }

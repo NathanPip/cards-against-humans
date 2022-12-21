@@ -7,7 +7,7 @@ const JudgesLounge: React.FC = () => {
   if(!isTurn) return null;
 
   return( 
-  <div>
+  <div className="w-full flex justify-center">
     <JudgesLoungeContent />
   </div>);
 };

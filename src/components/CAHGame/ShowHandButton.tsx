@@ -41,7 +41,7 @@ const ShowHandButton: React.FC<ShowHandProps> = ({ setIsShown, isShown }) => {
           setShow((prev) => (prev ? false : true));
           setIsShown((prev) => (prev ? false : true));
         }}
-        className="absolute top-0 left-1/2 -my-16 -translate-x-1/2 text-xl"
+        className="absolute top-0 -my-16 right-0 text-xl mx-4 text-semibold text-shadow-xl"
       >
         {show ? "Hide Cards" : "Show Cards"}
       </button>

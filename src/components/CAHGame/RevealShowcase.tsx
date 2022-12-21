@@ -9,19 +9,17 @@ const RevealShowcase: React.FC = () => {
   const [handsRevealed, setHandsRevealed] = useState(0);
   const animationAmt = useMemo(() => {
     if (handsRevealed === 0) return "0";
-    const amt = (handsRevealed * .5) * 100;
+    const amt = (handsRevealed * 100);
     return `${amt}%`;
   }, [handsRevealed])
   const handsRevealedStorage = useStorage((root) => root.CAH.handsRevealed);
-
-  console.log(animationAmt);
 
   useEffect(() => {
     setHandsRevealed(handsRevealedStorage)
   }, [handsRevealedStorage, setHandsRevealed])
 
   return (
-    <div style={{transform: `translateX(-${animationAmt})`}} className={`my-4 gap-4 flex self-start`}>
+    <div style={{transform: `translateX(-${animationAmt})`}} className={`mt-4 mb-10 w-full self-start flex overflow-visible`}>
         {cardsInRound &&
           cardsInRound.map((cards) => (
             <PickedHand key={cards.playerId} hand={cards} />

@@ -2,18 +2,11 @@ import { useEffect, useState } from "react";
 import { useEventListener } from "../../liveblocks.config";
 import CardDeck from "./CardDeck";
 import PlayerDeck from "./PlayerDeck";
+import PlayerDeckHelper from "./PlayerDeckHelper";
 import ShowHandButton from "./ShowHandButton";
 
 const PlayerContainer: React.FC = () => {
   const [isShown, setIsShown] = useState(true);
-
-//   useEventListener(({event}) => {
-//     if(event.type === "game action") {
-//         if(event.action === "start game") {
-//             setIsShown(true);
-//         }
-//     }
-//   })
 
   return (
     <div
@@ -22,6 +15,7 @@ const PlayerContainer: React.FC = () => {
       }`}
     >
       <ShowHandButton setIsShown={setIsShown} isShown/>
+      <PlayerDeckHelper />
       <CardDeck />
       <PlayerDeck />
     </div>
