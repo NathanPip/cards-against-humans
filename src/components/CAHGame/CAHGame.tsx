@@ -30,7 +30,7 @@ const CAHGame: React.FC = () => {
   const isHost = useSelf((me) => me.presence.isHost);
 
   return (
-    <div className="flex flex-col overflow-y-scroll py-12">
+    <div className="flex flex-col py-12 w-screen">
       {isHost && (
         <button className="absolute top-0" onClick={endGame}>
           exit

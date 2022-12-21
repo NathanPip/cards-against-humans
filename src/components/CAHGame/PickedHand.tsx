@@ -24,7 +24,9 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand, isJudgingHand }) => {
   const broadcast = useBroadcastEvent();
   const [numRevealed, setNumRevealed] = useState(0);
   const [canMove, setCanMove] = useState(false);
-  const [clicked, setClicked] = useState(isJudgingHand !== undefined ? isJudgingHand : false);
+  const [clicked, setClicked] = useState(
+    isJudgingHand !== undefined ? isJudgingHand : false
+  );
   const handsRevealed = useStorage((root) => root.CAH.handsRevealed);
   const connectedPlayersLength = useStorage(
     (root) => root.CAH.connectedPlayers.length
@@ -98,8 +100,13 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand, isJudgingHand }) => {
     <div
       onClick={handClickHandler}
       className={`${
-        gameState !== "waiting for judge" ? "w-screen" : ""
-      } flex flex-col items-center gap-2`}
+        gameState !== "waiting for judge" && !isJudgingHand ? "min-w-full" : ""
+      } ${
+        (gameState === "waiting for players to draw" ||
+          gameState === "ending round" ||
+          gameState === "ready to start round") &&
+        "absolute left-1/2 -translate-x-1/2"
+      } flex justify-center gap-2`}
     >
       <button
         onClick={nextClickHandler}
@@ -112,7 +119,7 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand, isJudgingHand }) => {
           <WhiteCard
             key={card.id}
             card={card}
-            type="round"
+            type={isJudgingHand ? "toReveal" : "round"}
             isRevealed={isJudgingHand}
             setRevealedAmt={setNumRevealed}
           />
