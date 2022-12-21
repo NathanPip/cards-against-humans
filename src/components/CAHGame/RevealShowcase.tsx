@@ -19,7 +19,7 @@ const RevealShowcase: React.FC = () => {
   }, [handsRevealedStorage, setHandsRevealed])
 
   return (
-    <div style={{transform: `translateX(-${animationAmt})`}} className={`mt-4 w-full self-start flex overflow-visible`}>
+    <div style={{transform: `translateX(-${animationAmt})`}} className={`mt-4 mb-10 w-full self-start flex overflow-visible`}>
         {cardsInRound &&
           cardsInRound.map((cards) => (
             <PickedHand key={cards.playerId} hand={cards} />

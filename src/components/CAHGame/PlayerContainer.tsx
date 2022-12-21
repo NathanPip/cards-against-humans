@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useEventListener } from "../../liveblocks.config";
 import CardDeck from "./CardDeck";
 import PlayerDeck from "./PlayerDeck";
+import PlayerDeckHelper from "./PlayerDeckHelper";
 import ShowHandButton from "./ShowHandButton";
 
 const PlayerContainer: React.FC = () => {
@@ -14,6 +15,7 @@ const PlayerContainer: React.FC = () => {
       }`}
     >
       <ShowHandButton setIsShown={setIsShown} isShown/>
+      <PlayerDeckHelper />
       <CardDeck />
       <PlayerDeck />
     </div>

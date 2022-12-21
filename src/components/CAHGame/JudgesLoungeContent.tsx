@@ -13,7 +13,6 @@ const JudgesLoungeContent: React.FC = () => {
       storage.get("CAH").set("activeState", "judge revealing");
       const isTurn = self.presence.CAHturn;
       if (isTurn) {
-        console.log("I am judge");
         setMyPresence({ currentAction: "revealing" });
       }
     },
@@ -32,19 +31,22 @@ const JudgesLoungeContent: React.FC = () => {
 
   if (gameState === "waiting for players")
     return (
-      <div className="flex justify-center text-xl text-shadow-xl font-semibold">
-        <p className="">Waiting for players to pick cards...</p>
-      </div>
+      <p className="mt-2 text-xl font-semibold text-shadow-lg">
+        Waiting for players to pick cards...
+      </p>
+    );
+
+  if (gameState === "waiting for players to draw")
+    return (
+      <p className="mt-2 text-xl font-semibold text-shadow-lg">
+        Waiting for players to draw cards...
+      </p>
     );
 
   if (gameState === "players picked")
-    return <button onClick={setRevealing}>Show me the cards</button>;
-
-  if (gameState === "waiting for players to draw")
-    return <p>Waiting for players to draw cards...</p>;
-
+    return <button className="text-xl mt-2 text-shadow-lg font-semibold bg-zinc-50 hover:bg-zinc-300 transition-colors p-3 rounded-md" onClick={setRevealing}>Show me the cards</button>;
   if (gameState === "ready to start round")
-    return <button onClick={newRoundClickHandler}>Start new Round</button>;
+    return <button className="text-xl mt-2 text-shadow-lg font-semibold bg-zinc-50 hover:bg-zinc-300 transition-colors p-3 rounded-md" onClick={newRoundClickHandler}>Start new Round</button>;
 
   return null;
 };

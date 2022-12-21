@@ -106,13 +106,31 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand, isJudgingHand }) => {
           gameState === "ending round" ||
           gameState === "ready to start round") &&
         "absolute left-1/2 -translate-x-1/2"
-      } flex justify-center gap-2`}
+      } relative flex justify-center gap-2`}
     >
       <button
         onClick={nextClickHandler}
-        className={`${!canMove || clicked ? "hidden" : ""} text-xl text-white`}
+        className={`${
+          !canMove || clicked ? "hidden" : ""
+        } absolute -bottom-12 text-2xl flex items-center bg-zinc-50 py-1 px-2 rounded-lg`}
       >
         Next Hand
+        {/* <span className="ml-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="h-6 w-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+            />
+          </svg>
+        </span> */}
       </button>
       {hand.cards.map((card) => {
         return (

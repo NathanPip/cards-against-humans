@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
-  plugins: [require("tailwindcss-textshadow")],
+  plugins: [require("tailwindcss-animated"), require("tailwindcss-textshadow")],
   theme: {
     extend: {
       keyframes: {
@@ -19,6 +19,10 @@ module.exports = {
         "draw-card": "card-draw 1s ease-in-out",
         "wiggle-card": "card-wiggle 1s ease-in-out .5s infinite",
       },
+      animationDelay: {
+        "3000": "3000ms",
+        "5000": "5000ms",
+      }
     },
   },
 };

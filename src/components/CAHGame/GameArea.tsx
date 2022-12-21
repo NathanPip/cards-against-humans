@@ -8,7 +8,7 @@ const GameArea: React.FC = () => {
   const gameState = useStorage((root) => root.CAH.activeState);
 
   return (
-    <div className="flex w-full flex-col items-center justify-center overflow-x-hidden py-4">
+    <div className="flex w-full flex-col items-center justify-center overflow-x-hidden">
       <BlackCard />
       {gameState === "judge revealing" && <RevealShowcase />}
       {(gameState === "waiting for players" ||
