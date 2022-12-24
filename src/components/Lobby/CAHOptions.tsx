@@ -168,22 +168,24 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
               ref={cardPacksSelect}
               className="max-h-60 max-w-md flex-col overflow-y-scroll pl-6 shadow-inset"
             >
-              <div className=" flex flex-col">
-                {data.cardPacks.map((pack) => (
-                  <div key={pack.id}>
-                    <label htmlFor={pack.name} key={pack.id + "label"}>
-                      {pack.name}
-                    </label>
-                    <div className=" relative bottom-5   mr-3 flex justify-end">
-                      <input
-                        type="checkbox"
-                        key={pack.id}
-                        name={pack.name}
-                        value={pack.id}
-                      />
+              <div className="relative">
+                <div className="  flex flex-col">
+                  {data.cardPacks.map((pack) => (
+                    <div key={pack.id}>
+                      <label htmlFor={pack.name} key={pack.id + "label"}>
+                        {pack.name}
+                      </label>
+                      <div className=" relative bottom-5   mr-3 flex justify-end">
+                        <input
+                          type="checkbox"
+                          key={pack.id}
+                          name={pack.name}
+                          value={pack.id}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </fieldset>
           </div>
