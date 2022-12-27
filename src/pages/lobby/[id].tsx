@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import React, { createContext, useRef, useState } from "react";
 import ErrorPage from "../../components/Error";
 import Loading from "../../components/Loading";
+import LobbyManager from "../../components/Lobby/LobbyManager";
 import LobbyScreen from "../../components/Lobby/LobbyScreen";
 import { type Presence, RoomProvider } from "../../liveblocks.config";
 import { trpc } from "../../utils/trpc";
@@ -14,6 +15,7 @@ const defaultPlayer: Presence = {
   name: "",
   score: 0,
   isHost: false,
+  canPlay: true,
   currentAction: "waiting",
   CAHWhiteCardIds: [],
   CAHBlackCardIds: [],
@@ -54,6 +56,7 @@ const GameRoom: NextPage = () => {
             {() => (
               <LobbyContext.Provider value={lobby.data}>
                 <LobbyScreen />
+                <LobbyManager />
               </LobbyContext.Provider>
             )}
           </ClientSideSuspense>

@@ -36,7 +36,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   const [error, setError] = useState<string | null>(null);
 
   const setOptions = liveblocksMutation(
-    ({ storage }, options, players: string[]) => {
+    ({ storage, self }, options, players: string[]) => {
       ///////////////////////////
       //ERROR NEEDS TO BE SET WITH TRY CATCH
       ///////////////////////////
@@ -49,7 +49,8 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
       const currentBlackCard =
         parsedOptions.blackCards[parsedOptions.blackCards.length - 1];
       if (!currentBlackCard) throw new Error("No black cards found");
-      console.log(storage.get("CAH"));
+      const myId = self.id;
+      storage.get("CAH").set("currentHost", myId);
       storage.get("CAH").set("options", obj);
       storage.get("CAH").set("whiteCards", parsedOptions.whiteCards);
       storage.get("CAH").set("blackCards", parsedOptions.blackCards);
@@ -72,6 +73,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   );
 
   const setisPlaying = liveblocksMutation(({ storage }) => {
+    console.log("ran");
     storage.set("currentGame", "Cards Against Humanity");
   }, []);
 
@@ -120,7 +122,6 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
 
       setOptions(gameOptions, playerData);
       setisPlaying();
-      console.log("ran");
     } catch (e) {
       if (e instanceof z.ZodError || e instanceof Error) setError(e.message);
       console.log(e);
