@@ -81,16 +81,6 @@ const GameManager: React.FC = () => {
     }
   });
 
-  ///////////////////////////////// Conditional Events //////////////////////////////////////
-
-  // Start Game
-  useEffect(() => {
-    if(othersActions.length < 2) {
-      window.dispatchEvent(new CustomEvent("can start", { detail: false }));
-    } else {
-      window.dispatchEvent(new CustomEvent("can start", { detail: true }));
-    }
-  }, [othersActions])
 
   ///////////////////////////////// GAME STATE MUTATIONS //////////////////////////////////////
 
@@ -335,11 +325,11 @@ const GameManager: React.FC = () => {
     if(!gameStarted) return;
     if(isHost) return;
     const ids = otherIds.map((other) => other[1]);
-    if(!ids.includes(currentHost) || ids.length < 2) {
+    if(!ids.includes(currentHost) || ids.length < 2 || connectedPlayers.length < 3) {
       console.log("ending game")
       endGame();
     }
-  }, [otherIds, currentHost, endGame, gameStarted, isHost])
+  }, [otherIds, currentHost, endGame, gameStarted, isHost, connectedPlayers])
 
   return <></>;
 };

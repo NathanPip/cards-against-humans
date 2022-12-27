@@ -4,6 +4,7 @@ import { useOthersMapped, useSelf, useStorage, useUpdateMyPresence } from "../..
 const LobbyManager: React.FC = () => {
     const updatePresence = useUpdateMyPresence();
     const myId = useSelf((me) => me.id);
+    const currentGame = useStorage((root) => root.currentGame);
     const othersIds = useOthersMapped((other) => other.id);
     const connectedPlayers = useStorage((root) => root.CAH.connectedPlayers);
   // if users ID does not exist in current players playing array, route player to lobby
@@ -27,7 +28,7 @@ const LobbyManager: React.FC = () => {
     } else {
       window.dispatchEvent(new CustomEvent("can start", { detail: true }));
     }
-  }, [othersIds])
+  }, [othersIds, currentGame])
 
     return null;
 }
