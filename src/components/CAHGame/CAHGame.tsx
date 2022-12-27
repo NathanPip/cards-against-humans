@@ -5,6 +5,7 @@ import GameArea from "./GameArea";
 import GameManager from "./GameManager";
 import InfoPanel from "./InfoPanel";
 import JudgesLounge from "./JudgesLounge";
+import OtherPlayersModal from "./OtherPlayersModal";
 import PlayerContainer from "./PlayerContainer";
 
 const CAHGame: React.FC = () => {
@@ -21,6 +22,7 @@ const CAHGame: React.FC = () => {
           exit
         </button>
       )}
+      <OtherPlayersModal />
       <GameManager />
       <InfoPanel />
       <GameArea />
