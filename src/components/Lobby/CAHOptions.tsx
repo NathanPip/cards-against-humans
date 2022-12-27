@@ -129,66 +129,75 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
 
   // ERROR STATES NEED TO BE SET
   return (
-    <div className="mt-12 flex justify-center">
-      <form onSubmit={handleSubmit} className="flex flex-col  items-center">
-        <div className="flex flex-col items-center rounded-2xl  border-2 border-solid border-black/40 bg-zinc-500/40">
-          <label className="mt-4 text-lg" htmlFor="points-to-win">
-            Score To Win
-          </label>
-          <input
-            className="mt-2 w-48 rounded-xl border-2 border-black/10 bg-zinc-500/40 text-white"
-            type="text"
-            defaultValue={10}
-            id="points-to-win"
-            ref={pointsToWinInput}
-          />
-          <label className="mt-4 text-lg" htmlFor="cards-per-player">
-            White Cards Per Player
-          </label>
-          <input
-            className="mt-2 w-48 rounded-xl border-2 border-black/10 bg-zinc-500/40 text-white"
-            type="text"
-            defaultValue={10}
-            id="cards-per-player"
-            ref={cardsPerPlayerInput}
-          />
+    <div className="flex justify-center">
+      <div className="mb-8 flex max-w-lg justify-center shadow-inset">
+        <form onSubmit={handleSubmit} className="flex flex-col  items-center">
+          <div className="flex  h-full  items-center  ">
+            <div className="flex w-48 flex-col items-center">
+              <label className="mt-4 text-lg" htmlFor="points-to-win">
+                Score To Win
+              </label>
+              <input
+                className="mt-2 w-12 rounded-xl border-2 border-black/10 bg-zinc-500/40 text-white"
+                type="text"
+                defaultValue={10}
+                id="points-to-win"
+                ref={pointsToWinInput}
+              />
+            </div>
+            <div className="ml-24 flex flex-col items-center">
+              <label className="mt-4 text-lg" htmlFor="cards-per-player">
+                White Cards Per Player
+              </label>
+              <input
+                className="mt-2 w-12 rounded-xl border-2 border-black/10 bg-zinc-500/40 text-white"
+                type="text"
+                defaultValue={10}
+                id="cards-per-player"
+                ref={cardsPerPlayerInput}
+              />
+            </div>
+          </div>
           <label className="max-w-1/5 mt-4 mb-4 text-lg" htmlFor="packs">
             Card Packs
           </label>
-          <div className="p-4 ">
+          <div className="flex content-center p-4 ">
             <fieldset
               name="packs"
               id="packs"
               ref={cardPacksSelect}
-              className="max-h-60 max-w-md flex-col overflow-y-scroll rounded-xl border-2 border-solid bg-zinc-800/40 pl-6"
+              className="max-h-60 max-w-md flex-col overflow-y-scroll pl-6 shadow-inset"
             >
-              <div className=" flex flex-col">
-                {data.cardPacks.map((pack) => (
-                  <div key={pack.id}>
-                    <label htmlFor={pack.name} key={pack.id + "label"}>
-                      {pack.name}
-                    </label>
-                    <div className=" relative bottom-5   mr-3 flex justify-end">
-                      <input
-                        type="checkbox"
-                        key={pack.id}
-                        name={pack.name}
-                        value={pack.id}
-                      />
+              <div className="relative">
+                <div className="  flex flex-col">
+                  {data.cardPacks.map((pack) => (
+                    <div key={pack.id}>
+                      <label htmlFor={pack.name} key={pack.id + "label"}>
+                        {pack.name}
+                      </label>
+                      <div className=" relative bottom-5   mr-3 flex justify-end">
+                        <input
+                          type="checkbox"
+                          key={pack.id}
+                          name={pack.name}
+                          value={pack.id}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </fieldset>
           </div>
-        </div>
-        <button
-          className="mt-14 h-14 w-2/5 rounded-xl bg-blue-500 font-bold text-white hover:bg-blue-700"
-          type="submit"
-        >
-          Start Game
-        </button>
-      </form>
+
+          <button
+            className="mt-14 mb-4 h-14 w-2/5 rounded-xl bg-blue-500 font-bold text-white hover:bg-blue-700"
+            type="submit"
+          >
+            Start Game
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
