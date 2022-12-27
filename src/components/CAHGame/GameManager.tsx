@@ -81,7 +81,16 @@ const GameManager: React.FC = () => {
     }
   });
 
+  ///////////////////////////////// Conditional Events //////////////////////////////////////
 
+  // Start Game
+  useEffect(() => {
+    if(othersActions.length < 2) {
+      window.dispatchEvent(new CustomEvent("can start", { detail: false }));
+    } else {
+      window.dispatchEvent(new CustomEvent("can start", { detail: true }));
+    }
+  }, [othersActions])
 
   ///////////////////////////////// GAME STATE MUTATIONS //////////////////////////////////////
 
@@ -286,6 +295,7 @@ const GameManager: React.FC = () => {
     setMyPresence({ CAHCardsRevealed: 0 });
   }, [broadcast]);
 
+  // Listen for end game event
   useEffect(() => {
     const handler = () => {
       endGame();
@@ -294,7 +304,7 @@ const GameManager: React.FC = () => {
     return () => window.removeEventListener("end game", handler)
   }, [endGame])
 
-  //disconnect players
+  //disconnect player based on id
   const disconnectPlayer = liveblocksMutation(({storage}, playerId: string) => {
     const connectPlayers  = storage.get("CAH").get("connectedPlayers");
     const newConnectedPlayers = connectPlayers.filter((player: string) => player !== playerId);
@@ -310,6 +320,7 @@ const GameManager: React.FC = () => {
     }
   }, [])
 
+  // Listen for disconnect player event
   useEffect(() => {
     const handler = (evt: CustomEvent) => {
       const id = z.string().parse(evt.detail);
@@ -319,11 +330,12 @@ const GameManager: React.FC = () => {
     return () => window.removeEventListener("disconnect player", handler as EventListener);
   }, [disconnectPlayer])
 
+  // End game if host disconnects
   useEffect(() => {
     if(!gameStarted) return;
     if(isHost) return;
     const ids = otherIds.map((other) => other[1]);
-    if(!ids.includes(currentHost)) {
+    if(!ids.includes(currentHost) || ids.length < 2) {
       console.log("ending game")
       endGame();
     }

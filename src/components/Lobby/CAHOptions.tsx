@@ -1,5 +1,6 @@
 import { LiveObject } from "@liveblocks/client";
 import { type inferRouterOutputs } from "@trpc/server";
+import { setMaxIdleHTTPParsers } from "http";
 import { useContext, useRef, useState } from "react";
 import { z } from "zod";
 import { useMutation as liveblocksMutation } from "../../liveblocks.config";
@@ -7,6 +8,7 @@ import { LobbyContext } from "../../pages/lobby/[id]";
 import { type AppRouter } from "../../server/trpc/router/_app";
 import { type CAHGameOptions } from "../../types/game";
 import { trpc } from "../../utils/trpc";
+import StartGameButton from "./StartGameButton";
 
 type CAHOptionsProps = {
   data: inferRouterOutputs<AppRouter>["game"]["getBasicGameInfo"];
@@ -36,7 +38,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   const [error, setError] = useState<string | null>(null);
 
   const setOptions = liveblocksMutation(
-    ({ storage, self }, options, players: string[]) => {
+    ({ storage, self, others }, options, players: string[]) => {
       ///////////////////////////
       //ERROR NEEDS TO BE SET WITH TRY CATCH
       ///////////////////////////
@@ -191,12 +193,7 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
             </fieldset>
           </div>
 
-          <button
-            className="mt-14 mb-4 h-14 w-2/5 rounded-xl bg-blue-500 font-bold text-white hover:bg-blue-700"
-            type="submit"
-          >
-            Start Game
-          </button>
+          <StartGameButton />
         </form>
       </div>
     </div>

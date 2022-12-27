@@ -1,9 +1,10 @@
 import { useEffect } from "react";
-import { useSelf, useStorage, useUpdateMyPresence } from "../../liveblocks.config";
+import { useOthersMapped, useSelf, useStorage, useUpdateMyPresence } from "../../liveblocks.config";
 
 const LobbyManager: React.FC = () => {
     const updatePresence = useUpdateMyPresence();
     const myId = useSelf((me) => me.id);
+    const othersIds = useOthersMapped((other) => other.id);
     const connectedPlayers = useStorage((root) => root.CAH.connectedPlayers);
   // if users ID does not exist in current players playing array, route player to lobby
   useEffect(() => {
@@ -15,6 +16,19 @@ const LobbyManager: React.FC = () => {
       updatePresence({canPlay: true})
     }
   }, [myId, connectedPlayers, updatePresence])
+
+
+    ///////////////////////////////// Conditional Events //////////////////////////////////////
+
+  // Start Game
+  useEffect(() => {
+    if(othersIds.length < 2) {
+      window.dispatchEvent(new CustomEvent("can start", { detail: false }));
+    } else {
+      window.dispatchEvent(new CustomEvent("can start", { detail: true }));
+    }
+  }, [othersIds])
+
     return null;
 }
 
