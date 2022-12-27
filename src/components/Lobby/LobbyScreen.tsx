@@ -4,12 +4,12 @@ import GameSelect from "./GameSelect";
 
 const LobbyScreen: React.FC = () => {
   const title = useStorage((root) => root.name);
-  const id = useSelf((me) => me.id);
   const isHost = useSelf((me) => me.presence.isHost);
   const others = useOthersMapped((other) => other.presence.name);
   const currentGame = useStorage((root) => root.currentGame);
+  const canPlay = useSelf((me) => me.presence.canPlay);
 
-  if (currentGame)
+  if (currentGame && canPlay)
     return (
       <div className="relative h-screen w-full overflow-hidden">
         <CAHGame />

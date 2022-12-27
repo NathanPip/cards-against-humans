@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { z } from "zod";
 import {
   useEventListener,
   useOthersMapped,
@@ -10,14 +11,16 @@ import {
 } from "../../liveblocks.config";
 
 const GameManager: React.FC = () => {
-  const id = useSelf((me) => me.id);
+  const myId = useSelf((me) => me.id);
   const updatePresence = useUpdateMyPresence();
   const blackCards = useSelf((me) => me.presence.CAHBlackCardIds);
   const isHost = useSelf((me) => me.presence.isHost);
   const othersDrawing = useOthersMapped(
     (others) => others.presence.currentAction
   );
-  const isTurn = useSelf((me) => me.presence.CAHturn);
+  const gameStarted = useStorage((root) => root.CAH.started);
+  const currentHost = useStorage((root) => root.CAH.currentHost);
+  const otherIds = useOthersMapped((others) => others.id);
   const cardsInRound = useStorage((root) => root.CAH.cardsInRound);
   const gameState = useStorage((root) => root.CAH.activeState);
   const currentBlackCard = useStorage((root) => root.CAH.currentBlackCard);
@@ -40,7 +43,7 @@ const GameManager: React.FC = () => {
     if (event.type === "game action") {
       // check if it's player's turn and update presence
       if (event.action === "start game") {
-        if (id !== currentPlayerTurn) {
+        if (myId !== currentPlayerTurn) {
           console.log("notTurn");
           updatePresence({ currentAction: "selecting" });
           updatePresence({ CAHturn: false });
@@ -66,18 +69,18 @@ const GameManager: React.FC = () => {
     if (event.type === "judge") {
       // check if player has won round and update presence
       if (event.data) {
-        if (event.data.id === id) {
+        if (event.data.id === myId) {
           if (!event.data.card.id) throw new Error("no card id");
           updatePresence({
             CAHBlackCardIds: blackCards
               ? [...blackCards, event.data.card.id]
               : [event.data.card.id],
           });
-          console.log("won");
         }
       }
     }
   });
+
 
   ///////////////////////////////// GAME STATE MUTATIONS //////////////////////////////////////
 
@@ -113,10 +116,10 @@ const GameManager: React.FC = () => {
     setMyPresence({ CAHCardsPicked: [] });
     setMyPresence({ CAHCardsRevealed: 0 });
 
-    console.log("my id is", id);
+    console.log("my id is", myId);
     console.log("current player turn is", nextPlayer);
 
-    if (id !== nextPlayer) {
+    if (myId !== nextPlayer) {
       console.log("notTurn");
       setMyPresence({ currentAction: "selecting" });
       setMyPresence({ CAHturn: false });
@@ -212,7 +215,7 @@ const GameManager: React.FC = () => {
   // START GAME ONCE PLAYERS HAVE DRAWN
   const startGame = liveblocksMutation(async ({ storage, setMyPresence }) => {
     const currentTurn = storage.get("CAH").get("currentPlayerTurn");
-    if (id !== currentTurn) {
+    if (myId !== currentTurn) {
       console.log("notTurn");
       setMyPresence({ currentAction: "selecting" });
       updatePresence({ CAHturn: false });
@@ -223,6 +226,7 @@ const GameManager: React.FC = () => {
     }
     storage.get("CAH").set("activeState", "waiting for players");
     storage.get("CAH").set("handsRevealed", 0);
+    storage.get("CAH").set("started", true);
     broadcast({ type: "game action", action: "start game" } as never);
   }, []);
 
@@ -252,7 +256,7 @@ const GameManager: React.FC = () => {
   // SET JUDGING STATE WHEN ALL PLAYERS HAVE PICKED
 
   const setPlayersReady = liveblocksMutation(
-    async ({ storage, self, setMyPresence }) => {
+    async ({ storage }) => {
       storage.get("CAH").set("activeState", "players picked");},
       []
   )
@@ -264,6 +268,68 @@ const GameManager: React.FC = () => {
       }
     }
   }, [cardsInRound, connectedPlayers, setPlayersReady, gameState]);
+
+  // End Game and Reset Game State
+  const endGame = liveblocksMutation(async ({ storage, setMyPresence }) => {
+    storage.set("currentGame", null);
+    storage.get("CAH").set("currentPlayerDrawing", undefined);
+    storage.get("CAH").set("cardsInRound", []);
+    storage.get("CAH").set("currentPlayerTurn", undefined);
+    storage.get("CAH").set("handsRevealed", 0);
+    storage.get("CAH").set("started", false);
+    broadcast({ type: "game action", action: "end game" } as never);
+    setMyPresence({ CAHturn: false });
+    setMyPresence({ CAHBlackCardIds: [] });
+    setMyPresence({ CAHWhiteCardIds: [] });
+    setMyPresence({ CAHCardsPicked: [] });
+    setMyPresence({ CAHCardsRevealed: 0 });
+  }, [broadcast]);
+
+  // Listen for end game event
+  useEffect(() => {
+    const handler = () => {
+      endGame();
+    }
+    window.addEventListener("end game", handler)
+    return () => window.removeEventListener("end game", handler)
+  }, [endGame])
+
+  //disconnect player based on id
+  const disconnectPlayer = liveblocksMutation(({storage}, playerId: string) => {
+    const connectPlayers  = storage.get("CAH").get("connectedPlayers");
+    const newConnectedPlayers = connectPlayers.filter((player: string) => player !== playerId);
+    storage.get("CAH").set("connectedPlayers", newConnectedPlayers);
+    const currentJudge = storage.get("CAH").get("currentPlayerTurn");
+    if (currentJudge === playerId) {
+      storage.get("CAH").set("currentPlayerTurn", newConnectedPlayers[Math.floor(Math.random()*newConnectedPlayers.length)]);
+    }
+    const cardsInRound = storage.get("CAH").get("cardsInRound");
+    if(cardsInRound?.length) {
+      const newCardsInRound = cardsInRound.filter((card) => card.playerId !== playerId);
+      storage.get("CAH").set("cardsInRound", newCardsInRound);
+    }
+  }, [])
+
+  // Listen for disconnect player event
+  useEffect(() => {
+    const handler = (evt: CustomEvent) => {
+      const id = z.string().parse(evt.detail);
+      disconnectPlayer(id);
+    }
+    window.addEventListener("disconnect player", handler as EventListener);
+    return () => window.removeEventListener("disconnect player", handler as EventListener);
+  }, [disconnectPlayer])
+
+  // End game if host disconnects
+  useEffect(() => {
+    if(!gameStarted) return;
+    if(isHost) return;
+    const ids = otherIds.map((other) => other[1]);
+    if(!ids.includes(currentHost) || ids.length < 2 || connectedPlayers.length < 3) {
+      console.log("ending game")
+      endGame();
+    }
+  }, [otherIds, currentHost, endGame, gameStarted, isHost, connectedPlayers])
 
   return <></>;
 };
