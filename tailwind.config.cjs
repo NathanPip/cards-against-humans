@@ -20,9 +20,13 @@ module.exports = {
         "wiggle-card": "card-wiggle 1s ease-in-out .5s infinite",
       },
       animationDelay: {
-        "3000": "3000ms",
-        "5000": "5000ms",
-      }
+        3000: "3000ms",
+        5000: "5000ms",
+      },
+
+      boxShadow: {
+        inset: "inset 0 0 4px 2px rgba(0,0,0,0.2)",
+      },
     },
   },
 };

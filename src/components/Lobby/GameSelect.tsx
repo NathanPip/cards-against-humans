@@ -15,7 +15,10 @@ const GameSelect: React.FC<GameProps> = ({ name }) => {
 
   return (
     <div>
-      <h1 className="flex justify-center text-4xl ">{name}</h1>
+      <h1 className="mt-8 flex h-24 justify-center pt-4 text-3xl  ">
+        Game Options
+      </h1>
+      {/* <h1 className="flex justify-center text-4xl ">{name}</h1> */}
       <CAHOptions data={gameInfo.data} />
     </div>
   );
