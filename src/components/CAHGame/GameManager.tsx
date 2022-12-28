@@ -69,6 +69,7 @@ const GameManager: React.FC = () => {
     if (event.type === "judge") {
       // check if player has won round and update presence
       if (event.data) {
+      window.dispatchEvent(new CustomEvent("winner chosen", {detail: event.data.id}));
         if (event.data.id === myId) {
           if (!event.data.card.id) throw new Error("no card id");
           updatePresence({

@@ -6,6 +6,7 @@ import {
   useBroadcastEvent,
   useEventListener,
 } from "../../liveblocks.config";
+import PlayerBlackCards from "./PlayerBlackCards";
 
 const CardDeck: React.FC = () => {
   const actionState = useSelf((me) => me.presence.currentAction);
@@ -67,6 +68,7 @@ const CardDeck: React.FC = () => {
           }}
           className="absolute top-0 mx-2 -my-28 h-fit w-fit"
         >
+          <PlayerBlackCards />
           <p className="mb-4 font-semibold animate-bounce text-shadow-xl absolute w-max top-0 -my-10 ">{actionState === "drawing" && "draw a card"}</p>
           <div
             className={`absolute transition-transform ${

@@ -7,6 +7,7 @@ import {
   useStorage,
 } from "../../liveblocks.config";
 import { useEffect, useState } from "react";
+import WinnersText from "./WinnerText";
 
 type PickedHandProps = {
   hand:
@@ -34,6 +35,7 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand, isJudgingHand }) => {
 
   const chooseWinner = liveblocksMutation(
     async ({ storage, setMyPresence }, id: string) => {
+      window.dispatchEvent(new CustomEvent("winner chosen", {detail: id}));
       storage.get("CAH").set("activeState", "ending round");
       const currentBlackCard = storage.get("CAH").get("currentBlackCard");
       const hand = storage
@@ -89,7 +91,6 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand, isJudgingHand }) => {
       setClicked(true);
     }
   };
-  console.log(gameState);
   useEffect(() => {
     if (numRevealed === hand.cards.length) {
       setCanMove(true);
@@ -115,22 +116,6 @@ const PickedHand: React.FC<PickedHandProps> = ({ hand, isJudgingHand }) => {
         } absolute -bottom-12 text-2xl flex items-center bg-zinc-50 py-1 px-2 rounded-lg`}
       >
         Next Hand
-        {/* <span className="ml-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="h-6 w-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-            />
-          </svg>
-        </span> */}
       </button>
       {hand.cards.map((card) => {
         return (

@@ -1,5 +1,6 @@
 import { useStorage } from "../../liveblocks.config";
 import PickedHand from "./PickedHand";
+import WinnersText from "./WinnerText";
 
 const JudgingArea: React.FC = () => {
   const cardsInRound = useStorage((root) => root.CAH.cardsInRound);
@@ -36,9 +37,11 @@ const JudgingArea: React.FC = () => {
                 isJudgingHand={true}
               />
             ));
+            
           }
           return hands;
         })()}
+        <WinnersText />
     </div>
   );
 };

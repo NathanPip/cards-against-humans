@@ -7,7 +7,7 @@ const GameOptionsModal: React.FC = () => {
   return (
     <>
       <button
-        className="absolute top-0 left-0 z-10 m-4"
+        className="absolute top-0 left-0 z-30 m-2"
         onClick={() => {
           setShowModal((prev) => !prev);
         }}
@@ -17,7 +17,7 @@ const GameOptionsModal: React.FC = () => {
       <div
         className={`${
           showModal ? "" : "hidden"
-        } fixed left-1/2 top-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 animate-fade items-center justify-center bg-zinc-700 bg-opacity-30`}
+        } fixed left-1/2 top-1/2 z-20 flex h-full w-full -translate-x-1/2 -translate-y-1/2 animate-fade items-center justify-center bg-zinc-700 bg-opacity-30`}
       >
         <GameOptions />
       </div>
