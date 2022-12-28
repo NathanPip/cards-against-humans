@@ -32,7 +32,7 @@ body {
   width: 90%;
   height: 2em;
   position: absolute;
-  bottom: 0;
+  bottom: 0.5em;
   left: 1em;
   background: linear-gradient(
     to bottom,
@@ -47,7 +47,7 @@ body {
   width: 90%;
   height: 2em;
   position: absolute;
-  bottom: 11.99em;
+  bottom: 12.45em;
   left: 1em;
   background: linear-gradient(
     to top,
