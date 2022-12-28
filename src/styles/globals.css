@@ -32,12 +32,12 @@ body {
   width: 90%;
   height: 2em;
   position: absolute;
-  bottom: 0;
+  bottom: 0.5em;
   left: 1em;
   background: linear-gradient(
     to bottom,
-    rgba(172, 172, 178, 0.015) 0%,
-    rgb(121, 121, 129) 100%
+    rgba(78, 78, 83, 0) 0%,
+    rgb(99, 99, 105) 100%
   );
 }
 
@@ -47,11 +47,11 @@ body {
   width: 90%;
   height: 2em;
   position: absolute;
-  top: 0;
+  bottom: 12.45em;
   left: 1em;
   background: linear-gradient(
     to top,
-    rgba(8, 8, 8, 0.047) 0%,
-    rgba(0, 0, 0, 0.337) 100%
+    rgba(118, 118, 127, 0) 0%,
+    rgb(118, 118, 127) 100%
   );
 }
