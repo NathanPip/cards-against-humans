@@ -1,12 +1,14 @@
 import { LiveObject } from "@liveblocks/client";
 import { type inferRouterOutputs } from "@trpc/server";
-import { useContext, useRef, useState } from "react";
+import { createRef, useContext, useState } from "react";
 import { z } from "zod";
 import { useMutation as liveblocksMutation } from "../../../liveblocks.config";
 import { LobbyContext } from "../../../pages/lobby/[id]";
 import { type AppRouter } from "../../../server/trpc/router/_app";
 import { type CAHGameOptions } from "../../../types/game";
 import { trpc } from "../../../utils/trpc";
+import GameSettings from "./GameSettings";
+import PacksList from "./PacksList";
 import StartGameButton from "./StartGameButton";
 
 type CAHOptionsProps = {
@@ -28,21 +30,16 @@ const FormOptionsInputsParser = z.object({
 const ConnectedPlayersParser = z.string().array().nonempty();
 
 const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
-  const pointsToWinInput = useRef<HTMLInputElement>(null);
-  const cardsPerPlayerInput = useRef<HTMLInputElement>(null);
-  const cardPacksSelect = useRef<HTMLFieldSetElement>(null);
+  const pointsToWinInput = createRef<HTMLInputElement>();
+  const cardsPerPlayerInput = createRef<HTMLInputElement>();
+  const cardPacksSelect = createRef<HTMLFieldSetElement>();
   const trpcContext = trpc.useContext();
   const lobby = useContext(LobbyContext);
-  const cardPacks = data.cardPacks.sort((a,b) => {
-    if(a.name === "CAH Base Set") return -1;
-    if(b.name === "CAH Base Set") return 1;
-    return 0;
-  })
 
   const [error, setError] = useState<string | null>(null);
 
   const setOptions = liveblocksMutation(
-    ({ storage, self, others }, options, players: string[]) => {
+    ({ storage, self }, options, players: string[]) => {
       ///////////////////////////
       //ERROR NEEDS TO BE SET WITH TRY CATCH
       ///////////////////////////
@@ -139,63 +136,13 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
     <div className="flex justify-center">
       <div className="mb-8 flex max-w-lg justify-center shadow-inset">
         <form onSubmit={handleSubmit} className="flex flex-col  items-center">
-          <div className="flex  h-full  items-center  ">
-            <div className="flex w-48 flex-col items-center">
-              <label className="mt-4 text-lg" htmlFor="points-to-win">
-                Score To Win
-              </label>
-              <input
-                className="mt-2 w-12 rounded-xl border-2 border-black/10 bg-zinc-500/40 text-white"
-                type="text"
-                defaultValue={10}
-                id="points-to-win"
-                ref={pointsToWinInput}
-              />
-            </div>
-            <div className="ml-24 flex flex-col items-center">
-              <label className="mt-4 text-lg" htmlFor="cards-per-player">
-                White Cards Per Player
-              </label>
-              <input
-                className="mt-2 w-12 rounded-xl border-2 border-black/10 bg-zinc-500/40 text-white"
-                type="text"
-                defaultValue={10}
-                id="cards-per-player"
-                ref={cardsPerPlayerInput}
-              />
-            </div>
-          </div>
+          <GameSettings pointsToWinInput={pointsToWinInput} cardsPerPlayerInput={cardsPerPlayerInput}/>
           <label className="max-w-1/5 mt-4 mb-4 text-lg font-semibold drop-shadow-xl" htmlFor="packs">
             Card Packs
           </label>
           <div className="flex content-center p-4 ">
-            <fieldset
-              name="packs"
-              ref={cardPacksSelect}
-              className="max-h-60 flex-col overflow-y-hidden shadow-inset relative"
-            >
-                <ul id="packs" className="flex flex-col gap-4 overflow-y-scroll py-3 h-full">
-                  {cardPacks.map((pack, index) => (
-                    <li className="flex items-center" key={pack.id}>
-                      <label className="font-semibold drop-shadow-sm ml-2 mr-auto" htmlFor={pack.name} key={pack.id + "label"}>
-                        {pack.name}
-                      </label>
-                        <p className="mx-1 py-1 px-2 rounded-md text-sm bg-white text-black font-semibold">{pack._count.whiteCards}</p>
-                        <p className="mx-1 py-1 px-2 rounded-md text-sm bg-black text-white font-semibold mr-4">{pack._count.blackCards}</p>
-                        <input
-                          className="card_pack_checkbox"
-                          type="checkbox"
-                          key={pack.id}
-                          name={pack.name}
-                          value={pack.id}
-                          checked={index === 0 ? true : undefined}
-                        />
-                    </li>
-                  ))}
-                </ul>
-            </fieldset>
+            <PacksList cardPacksSelect={cardPacksSelect} data={data}/>
           </div>
-
           <StartGameButton />
         </form>
       </div>
