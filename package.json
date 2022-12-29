@@ -10,6 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^1.0.0-beta.5",
     "@liveblocks/client": "^0.19.2",
     "@liveblocks/node": "^0.19.2",
     "@liveblocks/react": "^0.19.2",

@@ -36,6 +36,14 @@ const JudgesLoungeContent: React.FC = () => {
       </p>
     );
 
+    if(gameState === "waiting for judge") {
+      return (
+        <p className="mt-2 text-xl font-semibold text-shadow-lg">
+          Pick a winner
+        </p>
+      )
+    }
+
   if (gameState === "waiting for players to draw")
     return (
       <p className="mt-2 text-xl font-semibold text-shadow-lg">
