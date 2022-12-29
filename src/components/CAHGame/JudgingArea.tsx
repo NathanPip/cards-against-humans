@@ -1,3 +1,4 @@
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useStorage } from "../../liveblocks.config";
 import PickedHand from "./PickedHand";
 import WinnersText from "./WinnerText";
@@ -7,9 +8,13 @@ const JudgingArea: React.FC = () => {
   const handsRevealed = useStorage((root) => root.CAH.handsRevealed);
   const gameState = useStorage((root) => root.CAH.activeState);
 
+  const [container] = useAutoAnimate<HTMLDivElement>()
+
   return (
+    <>
     <div
-      className={`relative flex w-full gap-6 self-start overflow-x-scroll md:justify-center mt-4 px-4 py-2 ${
+      ref={container}
+      className={`relative flex w-fit max-w-full mx-auto gap-6 self-start overflow-x-scroll mt-4 px-4 py-2 ${
         gameState === "ending round" ||
         gameState === "waiting for players to draw" ||
         gameState === "ready to start round" ? "h-80" : ""
@@ -41,8 +46,9 @@ const JudgingArea: React.FC = () => {
           }
           return hands;
         })()}
-        <WinnersText />
     </div>
+    <WinnersText />
+    </>
   );
 };
 
