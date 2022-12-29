@@ -6,10 +6,16 @@ body {
   background: rgb(82, 82, 91);
   background: linear-gradient(
     90deg,
-    rgba(113, 113, 122, 1) 0%,
-    rgba(212, 212, 216, 1) 100%
+    rgb(171, 171, 182) 0%,
+    rgb(235, 235, 238) 100%
   );
   color: black;
+}
+
+@media (min-width: 1000px) {
+  html {
+    font-size: 1.2rem;
+  }
 }
 
 .judging_area::-webkit-scrollbar, .player_deck::-webkit-scrollbar {

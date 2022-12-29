@@ -1,24 +1,27 @@
-import { useCallback, useMemo } from "react";
-import { useOthersMapped, useSelf } from "../../liveblocks.config";
+import { useOthers, useSelf} from "../../liveblocks.config";
 import OtherPlayer from "./OtherPlayer";
 
 const OtherPlayers: React.FC = () => {
-  const othersNames = useOthersMapped((other) => other.presence.name);
-  const othersIds = useOthersMapped((other) => other.id);
-  const isHost = useSelf((self) => self.presence.isHost);
-  const consolidatedOthers = useMemo(() => {
-    return othersNames.map((name, index) => {
-      if (!othersIds || !othersIds[index]) throw new Error("no others found");
-      return { name: name[1], id: othersIds[index]![1] };
-    });
-  }, [othersIds, othersNames]);
+  const others = useOthers();
+  const isHost = useSelf((me) => me.presence.isHost);
 
   return (
-  <ul className={`h-fit bg-zinc-50 bg-opacity-70 z-index-10`}>
-    {consolidatedOthers.map((other) => {
-        return <OtherPlayer key={other.id} id={other.id} name={other.name} isHost={isHost} />
-    })}
-  </ul>
+    <ul
+      className={`z-index-10 mx-4 min-h-72 h-fit w-96 rounded-xl bg-zinc-800 p-8`}
+    >
+      {others.map((other) => {
+        return (
+          <OtherPlayer
+            key={other.id}
+            id={other.id}
+            isPlaying={other.presence.canPlay}
+            currentAction={other.presence.currentAction}
+            name={other.presence.name}
+            isHost={isHost}
+          />
+        );
+      })}
+    </ul>
   );
 };
 
