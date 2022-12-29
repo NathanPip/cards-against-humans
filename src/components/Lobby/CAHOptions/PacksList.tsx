@@ -9,8 +9,8 @@ type PacksListProps = {
 
 const PacksList: React.FC<PacksListProps> = ({ cardPacksSelect, data }) => {
   const cardPacks = data.cardPacks.sort((a, b) => {
-    if (a.name === "CAH Base Set") return -1;
-    if (b.name === "CAH Base Set") return 1;
+    if(a._count.whiteCards + a._count.blackCards > b._count.whiteCards + b._count.blackCards) return -1;
+    if(a._count.whiteCards + a._count.blackCards < b._count.whiteCards + b._count.blackCards) return 1;
     return 0;
   });
 

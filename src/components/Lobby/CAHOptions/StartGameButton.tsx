@@ -8,9 +8,9 @@ const StartGameButton: React.FC = () => {
     <button
       className={`${
         othersIds && othersIds.length >= 2
-          ? "bg-blue-500"
-          : "pointer-events-none bg-slate-700"
-      } mt-14 mb-4 h-14 w-28 rounded-lg bg-blue-500 py-1 font-bold text-white hover:bg-blue-700`}
+          ? "bg-zinc-50 hover:bg-zinc-800 hover:text-zinc-50"
+          : "pointer-events-none bg-zinc-500"
+      } mt-14 mb-4 h-14 w-28 rounded-lg transition-colors duration-500 py-1 font-bold text-zinc-900`}
       type="submit"
     >
       Start Game

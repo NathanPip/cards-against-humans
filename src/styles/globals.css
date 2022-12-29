@@ -19,38 +19,40 @@ body {
 }
 
 .judging_area::-webkit-scrollbar,
-.player_deck::-webkit-scrollbar {
+.player_deck::-webkit-scrollbar,
+#packs::-webkit-scrollbar {
   height: 0.5em;
 }
 
 .judging_area::-webkit-scrollbar-track,
-.player_deck::-webkit-scrollbar-track {
+.player_deck::-webkit-scrollbar-track,
+#packs::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0);
 }
 
 .judging_area::-webkit-scrollbar-thumb,
-.player_deck::-webkit-scrollbar-thumb {
+.player_deck::-webkit-scrollbar-thumb,
+#packs::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.2);
   transition: background-color 0.5s ease;
   border-radius: 1em;
 }
 .judging_area::-webkit-scrollbar-thumb:hover,
-.player_deck::-webkit-scrollbar-thumb:hover {
+.player_deck::-webkit-scrollbar-thumb:hover,
+#packs::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-#packs::-webkit-scrollbar {
-  width: 0.6em;
+.number-select::-webkit-scrollbar {
+  height: .25em;
 }
-
-#packs::-webkit-scrollbar-track {
-  background: rgb(45, 92, 76);
-  border-radius: 1em;
+.number-select::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  transition: background-color 0.5s ease;
+  border-radius: .5em;
 }
-
-#packs::-webkit-scrollbar-thumb {
-  background: rgba(9, 6, 84, 0.188);
-  border-radius: 1em;
+.number-select::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 #packs::before {

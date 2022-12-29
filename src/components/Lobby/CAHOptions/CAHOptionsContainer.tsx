@@ -30,8 +30,8 @@ const FormOptionsInputsParser = z.object({
 const ConnectedPlayersParser = z.string().array().nonempty();
 
 const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
-  const pointsToWinInput = createRef<HTMLInputElement>();
-  const cardsPerPlayerInput = createRef<HTMLInputElement>();
+  const pointsToWinInput = createRef<HTMLSelectElement>();
+  const cardsPerPlayerInput = createRef<HTMLSelectElement>();
   const cardPacksSelect = createRef<HTMLFieldSetElement>();
   const trpcContext = trpc.useContext();
   const lobby = useContext(LobbyContext);
