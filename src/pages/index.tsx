@@ -13,9 +13,8 @@ const Home: NextPage = () => {
       </Head>
       <header className="fixed mt-12 w-full bg-opacity-0 text-center">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-          <span className="text-[hsl(280,100%,70%)]">Party</span> Deck
+          <span className="text-zinc-50">Cards</span> Against Humanity 
         </h1>
-        <h2 className="mt-4 text-4xl font-bold">Bring Your Friends</h2>
       </header>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b ">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
@@ -35,14 +34,14 @@ const LoginGroup: React.FC = () => {
     <div className="flex flex-col items-center justify-center gap-4">
       {!sessionData ? (
         <button
-          className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+          className="rounded-full bg-zinc-900 px-10 py-3 font-semibold text-zinc-50 no-underline transition-colors duration-300 hover:bg-zinc-50 hover:text-zinc-900"
           onClick={() => signIn()}
         >
           {"Sign in with Discord"}
         </button>
       ) : (
         <Link
-          className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+          className="rounded-full bg-zinc-900 px-10 py-3 font-semibold text-zinc-50 no-underline transition-colors duration-300 hover:bg-zinc-50 hover:text-zinc-900"
           href="/lobby"
         >
           Create Lobby
