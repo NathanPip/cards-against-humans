@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useOthersMapped } from "../../liveblocks.config";
+import { useOthersMapped } from "../../../liveblocks.config";
 
 const StartGameButton: React.FC = () => {
   const othersIds = useOthersMapped((other) => other.id);

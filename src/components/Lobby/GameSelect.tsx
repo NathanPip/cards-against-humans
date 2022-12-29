@@ -1,6 +1,6 @@
 import { trpc } from "../../utils/trpc";
 import Loading from "../Loading";
-import CAHOptions from "./CAHOptions";
+import CAHOptions from "./CAHOptions/CAHOptionsContainer";
 
 type GameProps = {
   name: "Cards Against Humanity";
