@@ -6,52 +6,111 @@ body {
   background: rgb(82, 82, 91);
   background: linear-gradient(
     90deg,
-    rgba(113, 113, 122, 1) 0%,
-    rgba(212, 212, 216, 1) 100%
+    rgb(171, 171, 182) 0%,
+    rgb(235, 235, 238) 100%
   );
   color: black;
 }
 
+@media (min-width: 1000px) {
+  html {
+    font-size: 1.2rem;
+  }
+}
+
+.judging_area::-webkit-scrollbar,
+.player_deck::-webkit-scrollbar,
 #packs::-webkit-scrollbar {
-  width: 0.6em;
+  height: 0.5em;
 }
 
+.judging_area::-webkit-scrollbar-track,
+.player_deck::-webkit-scrollbar-track,
 #packs::-webkit-scrollbar-track {
-  background: rgb(45, 92, 76);
-  border-radius: 1em;
+  background-color: rgba(0, 0, 0, 0);
 }
 
+.judging_area::-webkit-scrollbar-thumb,
+.player_deck::-webkit-scrollbar-thumb,
 #packs::-webkit-scrollbar-thumb {
-  background: rgba(9, 6, 84, 0.188);
+  background-color: rgba(0, 0, 0, 0.2);
+  transition: background-color 0.5s ease;
   border-radius: 1em;
+}
+.judging_area::-webkit-scrollbar-thumb:hover,
+.player_deck::-webkit-scrollbar-thumb:hover,
+#packs::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.number-select::-webkit-scrollbar {
+  height: .25em;
+}
+.number-select::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  transition: background-color 0.5s ease;
+  border-radius: .5em;
+}
+.number-select::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 #packs::before {
+  position: absolute;
   content: "";
   margin-bottom: -33px;
-  width: 90%;
+  width: 100%;
   height: 2em;
-  position: absolute;
-  bottom: 0.5em;
-  left: 1em;
+  bottom: 1em;
+  left: 0;
+  pointer-events: none;
   background: linear-gradient(
     to bottom,
-    rgba(78, 78, 83, 0) 0%,
-    rgb(99, 99, 105) 100%
+    rgba(207, 207, 214, 0) 0%,
+    rgba(207, 207, 214, 1) 100%
   );
 }
 
 #packs::after {
   content: "";
-  margin-bottom: -15px;
-  width: 90%;
+  width: 100%;
   height: 2em;
   position: absolute;
-  bottom: 12.45em;
-  left: 1em;
+  left: 0;
+  pointer-events: none;
+  top: -0.25em;
   background: linear-gradient(
     to top,
-    rgba(118, 118, 127, 0) 0%,
-    rgb(118, 118, 127) 100%
+    rgba(207, 207, 214, 0) 0%,
+    rgba(207, 207, 214, 1) 100%
   );
+}
+
+.card_pack_checkbox {
+  appearance: none;
+  margin: 0;
+  background-color: white;
+  border: 2px solid black;
+  display: grid;
+  place-content: center;
+  width: 1.5rem;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+}
+
+.card_pack_checkbox::before {
+  content: "";
+  width: .9em;
+  min-width: .9rem;
+  height: .9em;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  background-color: black;
+  border-radius: 0.15rem;
+}
+
+.card_pack_checkbox:checked::before {
+  transform: scale(1);
 }

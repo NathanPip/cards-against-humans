@@ -35,7 +35,7 @@ const WinnersText: React.FC = () => {
     gameState !== "waiting for players to draw" &&
     gameState !== "ready to start round"
   ) return null;
-    return <p className="absolute bottom-0 mb-4 text-2xl left-1/2 -translate-x-1/2 w-full text-center text-shadow-lg font-semibold">{winnerName} has won the round</p>;
+    return <p className="text-2xl left-1/2 -translate-x-1/2text-center text-shadow-lg font-semibold">{winnerName} has won the round</p>;
 };
 
 export default WinnersText;

@@ -94,6 +94,7 @@ export const {
     useMyPresence,
     useSelf,
     useOthersMapped,
+    useOthers,
     useStorage,
     useMutation,
     useUpdateMyPresence,

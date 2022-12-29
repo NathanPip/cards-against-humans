@@ -1,3 +1,4 @@
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useOthersMapped, useSelf, useStorage } from "../../liveblocks.config";
 import CAHGame from "../CAHGame/CAHGame";
 import GameSelect from "./GameSelect";
@@ -8,6 +9,8 @@ const LobbyScreen: React.FC = () => {
   const others = useOthersMapped((other) => other.presence.name);
   const currentGame = useStorage((root) => root.currentGame);
   const canPlay = useSelf((me) => me.presence.canPlay);
+
+  const [playerContainer] = useAutoAnimate<HTMLDivElement>();
 
   if (currentGame && canPlay)
     return (
@@ -20,18 +23,16 @@ const LobbyScreen: React.FC = () => {
     <>
       <h1 className="mb-4 flex justify-center text-4xl">{title}</h1>
       {/* <p className="flex justify-end">{id}</p> */}
-      <div className="max-w-md ">
-        <h2 className=" mt-8 mb-4 flex w-full  justify-center text-lg">
+      <div className="max-w-xl mx-auto">
+        <h2 className=" mt-8 mb-4 flex w-full  justify-center text-3xl">
           Players
         </h2>
-        <div className="mb-4 h-44 shadow-inset ">
-          <div className=" ml-8 h-24 max-w-full  ">
+          <div ref={playerContainer} className="shadow-inset p-4 flex flex-col items-center mx-2">
             {others.map((name) => (
-              <div className=" flex justify-start text-lg" key={name[0]}>
+              <div className="text-lg" key={name[0]}>
                 {name[1]}
               </div>
             ))}
-          </div>
         </div>
       </div>
       {isHost && <GameSelect name="Cards Against Humanity"></GameSelect>}

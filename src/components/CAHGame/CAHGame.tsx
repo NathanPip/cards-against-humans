@@ -1,6 +1,3 @@
-import {
-  useSelf,
-} from "../../liveblocks.config";
 import GameArea from "./GameArea";
 import GameManager from "./GameManager";
 import GameOptionsModal from "./GameOptionsModal";
@@ -16,7 +13,7 @@ const CAHGame: React.FC = () => {
   const [container] = useAutoAnimate<HTMLDivElement>();
 
   return (
-    <div ref={container} className="flex flex-col pt-4 w-screen h-screen">
+    <div ref={container} className="flex flex-col pt-4 w-screen h-screen max-w-7xl mx-auto">
       <GameOverScreen />
       <GameOptionsModal />
       <OtherPlayersModal />

@@ -1,6 +1,6 @@
 import { trpc } from "../../utils/trpc";
 import Loading from "../Loading";
-import CAHOptions from "./CAHOptions";
+import CAHOptions from "./CAHOptions/CAHOptionsContainer";
 
 type GameProps = {
   name: "Cards Against Humanity";
@@ -14,7 +14,7 @@ const GameSelect: React.FC<GameProps> = ({ name }) => {
   if (gameInfo.isError || !gameInfo.data) return <div>Error</div>;
 
   return (
-    <div>
+    <div className="px-2">
       <h1 className="mt-8 flex h-24 justify-center pt-4 text-3xl  ">
         Game Options
       </h1>

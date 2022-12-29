@@ -1,13 +1,14 @@
 import { LiveObject } from "@liveblocks/client";
 import { type inferRouterOutputs } from "@trpc/server";
-import { setMaxIdleHTTPParsers } from "http";
-import { useContext, useRef, useState } from "react";
+import { createRef, useContext, useState } from "react";
 import { z } from "zod";
-import { useMutation as liveblocksMutation } from "../../liveblocks.config";
-import { LobbyContext } from "../../pages/lobby/[id]";
-import { type AppRouter } from "../../server/trpc/router/_app";
-import { type CAHGameOptions } from "../../types/game";
-import { trpc } from "../../utils/trpc";
+import { useMutation as liveblocksMutation } from "../../../liveblocks.config";
+import { LobbyContext } from "../../../pages/lobby/[id]";
+import { type AppRouter } from "../../../server/trpc/router/_app";
+import { type CAHGameOptions } from "../../../types/game";
+import { trpc } from "../../../utils/trpc";
+import GameSettings from "./GameSettings";
+import PacksList from "./PacksList";
 import StartGameButton from "./StartGameButton";
 
 type CAHOptionsProps = {
@@ -29,16 +30,16 @@ const FormOptionsInputsParser = z.object({
 const ConnectedPlayersParser = z.string().array().nonempty();
 
 const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
-  const pointsToWinInput = useRef<HTMLInputElement>(null);
-  const cardsPerPlayerInput = useRef<HTMLInputElement>(null);
-  const cardPacksSelect = useRef<HTMLFieldSetElement>(null);
+  const pointsToWinInput = createRef<HTMLSelectElement>();
+  const cardsPerPlayerInput = createRef<HTMLSelectElement>();
+  const cardPacksSelect = createRef<HTMLFieldSetElement>();
   const trpcContext = trpc.useContext();
   const lobby = useContext(LobbyContext);
 
   const [error, setError] = useState<string | null>(null);
 
   const setOptions = liveblocksMutation(
-    ({ storage, self, others }, options, players: string[]) => {
+    ({ storage, self }, options, players: string[]) => {
       ///////////////////////////
       //ERROR NEEDS TO BE SET WITH TRY CATCH
       ///////////////////////////
@@ -133,66 +134,15 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   // ERROR STATES NEED TO BE SET
   return (
     <div className="flex justify-center">
-      <div className="mb-8 flex max-w-lg justify-center shadow-inset">
-        <form onSubmit={handleSubmit} className="flex flex-col  items-center">
-          <div className="flex  h-full  items-center  ">
-            <div className="flex w-48 flex-col items-center">
-              <label className="mt-4 text-lg" htmlFor="points-to-win">
-                Score To Win
-              </label>
-              <input
-                className="mt-2 w-12 rounded-xl border-2 border-black/10 bg-zinc-500/40 text-white"
-                type="text"
-                defaultValue={10}
-                id="points-to-win"
-                ref={pointsToWinInput}
-              />
-            </div>
-            <div className="ml-24 flex flex-col items-center">
-              <label className="mt-4 text-lg" htmlFor="cards-per-player">
-                White Cards Per Player
-              </label>
-              <input
-                className="mt-2 w-12 rounded-xl border-2 border-black/10 bg-zinc-500/40 text-white"
-                type="text"
-                defaultValue={10}
-                id="cards-per-player"
-                ref={cardsPerPlayerInput}
-              />
-            </div>
-          </div>
-          <label className="max-w-1/5 mt-4 mb-4 text-lg" htmlFor="packs">
+      <div className="mb-8 flex justify-center shadow-inset">
+        <form onSubmit={handleSubmit} className="flex flex-col items-center">
+          <GameSettings pointsToWinInput={pointsToWinInput} cardsPerPlayerInput={cardsPerPlayerInput}/>
+          <label className="mt-4 mb-4 text-lg font-semibold drop-shadow-xl" htmlFor="packs">
             Card Packs
           </label>
-          <div className="flex content-center p-4 ">
-            <fieldset
-              name="packs"
-              id="packs"
-              ref={cardPacksSelect}
-              className="max-h-60 max-w-md flex-col overflow-y-scroll pl-6 shadow-inset"
-            >
-              <div className="relative">
-                <div className="  flex flex-col">
-                  {data.cardPacks.map((pack) => (
-                    <div key={pack.id}>
-                      <label htmlFor={pack.name} key={pack.id + "label"}>
-                        {pack.name}
-                      </label>
-                      <div className=" relative bottom-5   mr-3 flex justify-end">
-                        <input
-                          type="checkbox"
-                          key={pack.id}
-                          name={pack.name}
-                          value={pack.id}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </fieldset>
+          <div className="flex p-4 max-w-xl">
+            <PacksList cardPacksSelect={cardPacksSelect} data={data}/>
           </div>
-
           <StartGameButton />
         </form>
       </div>
