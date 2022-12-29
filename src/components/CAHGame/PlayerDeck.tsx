@@ -105,7 +105,7 @@ const PlayerDeck: React.FC = () => {
   }, [hand, updatePresence])
 
   return (
-    <div className="p-4 flex gap-4 overflow-x-scroll overflow-y-visible">
+    <div className="player_deck p-4 mb-4 flex gap-4 overflow-x-scroll overflow-y-visible">
       {hand &&
         hand.map((card, index) => (
           <WhiteCard card={card} type="hand" setHand={setHand} key={card.id + index*Math.random()}/>

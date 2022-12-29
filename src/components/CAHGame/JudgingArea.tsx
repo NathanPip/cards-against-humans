@@ -14,7 +14,7 @@ const JudgingArea: React.FC = () => {
     <>
     <div
       ref={container}
-      className={`relative flex w-fit max-w-full mx-auto gap-6 self-start overflow-x-scroll mt-4 px-4 py-2 ${
+      className={`judging_area relative flex w-fit max-w-full mx-auto gap-6 self-start overflow-x-scroll mt-4 px-4 py-2 ${
         gameState === "ending round" ||
         gameState === "waiting for players to draw" ||
         gameState === "ready to start round" ? "h-80" : ""
