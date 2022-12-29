@@ -27,7 +27,7 @@ const PacksList: React.FC<PacksListProps> = ({ cardPacksSelect, data }) => {
         {cardPacks.map((pack, index) => (
           <li className="flex items-center" key={pack.id}>
             <label
-              className="ml-2 mr-auto font-semibold drop-shadow-sm"
+              className="ml-2 mr-auto font-semibold drop-shadow-sm px-1"
               htmlFor={pack.name}
               key={pack.id + "label"}
             >

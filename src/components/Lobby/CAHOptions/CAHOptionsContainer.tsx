@@ -134,13 +134,13 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
   // ERROR STATES NEED TO BE SET
   return (
     <div className="flex justify-center">
-      <div className="mb-8 flex max-w-lg justify-center shadow-inset">
-        <form onSubmit={handleSubmit} className="flex flex-col  items-center">
+      <div className="mb-8 flex justify-center shadow-inset">
+        <form onSubmit={handleSubmit} className="flex flex-col items-center">
           <GameSettings pointsToWinInput={pointsToWinInput} cardsPerPlayerInput={cardsPerPlayerInput}/>
-          <label className="max-w-1/5 mt-4 mb-4 text-lg font-semibold drop-shadow-xl" htmlFor="packs">
+          <label className="mt-4 mb-4 text-lg font-semibold drop-shadow-xl" htmlFor="packs">
             Card Packs
           </label>
-          <div className="flex content-center p-4 ">
+          <div className="flex p-4 max-w-xl">
             <PacksList cardPacksSelect={cardPacksSelect} data={data}/>
           </div>
           <StartGameButton />

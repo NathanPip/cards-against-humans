@@ -94,6 +94,7 @@ body {
   display: grid;
   place-content: center;
   width: 1.5rem;
+  min-width: 1.5rem;
   height: 1.5rem;
   border-radius: 0.25rem;
   margin-right: 0.5rem;
@@ -102,6 +103,7 @@ body {
 .card_pack_checkbox::before {
   content: "";
   width: .9em;
+  min-width: .9rem;
   height: .9em;
   transform: scale(0);
   transition: 120ms transform ease-in-out;

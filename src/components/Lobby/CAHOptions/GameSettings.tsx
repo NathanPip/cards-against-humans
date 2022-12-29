@@ -8,8 +8,8 @@ const GameSettings: React.FC<GameSettingsProps> = ({
   cardsPerPlayerInput,
 }) => {
   return (
-    <div className="flex  h-full  items-center  ">
-      <div className="flex w-48 flex-col items-center">
+    <div className="flex justify-between w-full px-4">
+      <div className="flex flex-col items-center justify-center">
         <label className="mt-4 text-lg font-semibold drop-shadow-md" htmlFor="points-to-win">
           Score To Win
         </label>
@@ -32,8 +32,8 @@ const GameSettings: React.FC<GameSettingsProps> = ({
           })()}
         </select>
       </div>
-      <div className="ml-24 flex flex-col items-center">
-        <label className="mt-4 text-lg font-semibold drop-shadow-md" htmlFor="cards-per-player">
+      <div className="flex flex-col items-center">
+        <label className="mt-4 text-lg w-fit font-semibold drop-shadow-md" htmlFor="cards-per-player">
           White Cards Per Player
         </label>
         <select
