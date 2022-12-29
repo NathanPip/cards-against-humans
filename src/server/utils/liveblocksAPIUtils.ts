@@ -74,6 +74,7 @@ const initialRoomStorageBody = {
         currentWhiteCard: 0,
         currentBlackCard: 0,
         whiteCardsToPick: 0,
+        winner: null,
         started: false,
         currentPlayerDrawing: "",
         currentPlayerTurn: "",

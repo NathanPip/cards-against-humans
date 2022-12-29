@@ -47,6 +47,7 @@ export type Storage = {
   CAH: LiveObject<{
     options: CAHGameOptions;
     started: boolean;
+    winner: string | null;
     whiteCards: Card[];
     blackCards: Card[];
     cardsInRound: { cards: Required<Card>[]; playerId: string }[] | undefined;
@@ -70,7 +71,8 @@ export type Storage = {
       | "waiting for players to draw"
       | "ready to start round"
       | "starting round"
-      | "ending game";
+      | "ending game"
+      | "game over"
   }>;
 };
 

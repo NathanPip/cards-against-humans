@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { z } from "zod";
 import {
   useEventListener,
@@ -18,9 +18,14 @@ const GameManager: React.FC = () => {
   const othersDrawing = useOthersMapped(
     (others) => others.presence.currentAction
   );
+  const myBlackCards = useSelf((me) => me.presence.CAHBlackCardIds);
   const gameStarted = useStorage((root) => root.CAH.started);
   const currentHost = useStorage((root) => root.CAH.currentHost);
   const otherIds = useOthersMapped((others) => others.id);
+  const othersBlackCards = useOthersMapped((other) => {
+    return other.presence.CAHBlackCardIds;
+  })
+  const cardsToWin = useStorage((root) => root.CAH.options.pointsToWin);
   const cardsInRound = useStorage((root) => root.CAH.cardsInRound);
   const gameState = useStorage((root) => root.CAH.activeState);
   const currentBlackCard = useStorage((root) => root.CAH.currentBlackCard);
@@ -176,6 +181,7 @@ const GameManager: React.FC = () => {
   useEffect(() => {
     if(!isHost) return;
     const handler = () => {
+
         startNewRound();
     }
     window.addEventListener("start round", handler)
@@ -272,18 +278,19 @@ const GameManager: React.FC = () => {
 
   // End Game and Reset Game State
   const endGame = liveblocksMutation(async ({ storage, setMyPresence }) => {
-    storage.set("currentGame", null);
     storage.get("CAH").set("currentPlayerDrawing", undefined);
     storage.get("CAH").set("cardsInRound", []);
     storage.get("CAH").set("currentPlayerTurn", undefined);
     storage.get("CAH").set("handsRevealed", 0);
     storage.get("CAH").set("started", false);
+    storage.get("CAH").set("winner", null);
     broadcast({ type: "game action", action: "end game" } as never);
     setMyPresence({ CAHturn: false });
     setMyPresence({ CAHBlackCardIds: [] });
     setMyPresence({ CAHWhiteCardIds: [] });
     setMyPresence({ CAHCardsPicked: [] });
     setMyPresence({ CAHCardsRevealed: 0 });
+    storage.set("currentGame", null);
   }, [broadcast]);
 
   // Listen for end game event
@@ -331,6 +338,28 @@ const GameManager: React.FC = () => {
       endGame();
     }
   }, [otherIds, currentHost, endGame, gameStarted, isHost, connectedPlayers])
+
+  // Set win state if player has won
+  const setWinner = liveblocksMutation(({storage}, playerId: string) => {
+    storage.get("CAH").set("winner", playerId);
+    storage.get("CAH").set("activeState", "game over");
+  }, [])
+
+  useEffect(() => {
+    if(!isHost) return;
+    if(myBlackCards && myBlackCards?.length >= cardsToWin && myId) {
+      setWinner(myId);
+      return;
+    }
+    othersBlackCards.forEach((other) => {
+      const id = otherIds.find(id => id[0] === other[0])?.[1];
+      if(!other[1] || !id) throw new Error("no id found player");
+      if(other[1].length >= cardsToWin) {
+        setWinner(id);
+        return;
+      }
+    })
+  }, [ isHost, myBlackCards, myId, othersBlackCards, otherIds, cardsToWin, setWinner])
 
   return <></>;
 };
