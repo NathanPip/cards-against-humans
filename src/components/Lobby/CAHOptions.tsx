@@ -167,12 +167,10 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
           <div className="flex content-center p-4 ">
             <fieldset
               name="packs"
-              id="packs"
               ref={cardPacksSelect}
-              className="max-h-60 max-w-md flex-col overflow-y-scroll pl-6 shadow-inset"
+              className="max-h-60 flex-col overflow-y-hidden pl-6 shadow-inset relative"
             >
-              <div className="relative">
-                <div className="  flex flex-col">
+                <div id="packs" className="flex flex-col overflow-y-scroll py-3 h-full">
                   {data.cardPacks.map((pack) => (
                     <div key={pack.id}>
                       <label htmlFor={pack.name} key={pack.id + "label"}>
@@ -189,7 +187,6 @@ const CAHOptions: React.FC<CAHOptionsProps> = ({ data }) => {
                     </div>
                   ))}
                 </div>
-              </div>
             </fieldset>
           </div>
 

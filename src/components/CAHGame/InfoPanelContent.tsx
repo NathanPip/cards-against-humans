@@ -8,7 +8,7 @@ const InfoPanelContent: React.FC = () => {
     <p className="flex justify-center text-xl mt-2 text-shadow-lg font-semibold">
       {(gameState === "waiting for players" && actionState === "waiting") ||
       gameState === "waiting for players to draw"
-        ? "Waiting for players to draw Cards"
+        ? "Waiting For Players to Select Cards"
         : ""}
         {gameState === "players picked" ? "Waiting for Judge to Start" : ""}
         {gameState === "judge revealing" ? "Judge Revealing Cards" : ""}
