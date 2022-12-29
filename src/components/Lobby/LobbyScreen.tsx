@@ -2,6 +2,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useOthersMapped, useSelf, useStorage } from "../../liveblocks.config";
 import CAHGame from "../CAHGame/CAHGame";
 import GameSelect from "./GameSelect";
+import InviteButton from "./InviteButton";
 
 const LobbyScreen: React.FC = () => {
   const title = useStorage((root) => root.name);
@@ -20,7 +21,8 @@ const LobbyScreen: React.FC = () => {
     );
 
   return (
-    <>
+    <div className="relative max-w-7xl mx-auto">
+      <InviteButton />
       <h1 className="mb-4 flex justify-center text-4xl">{title}</h1>
       {/* <p className="flex justify-end">{id}</p> */}
       <div className="max-w-xl mx-auto">
@@ -36,7 +38,7 @@ const LobbyScreen: React.FC = () => {
         </div>
       </div>
       {isHost && <GameSelect name="Cards Against Humanity"></GameSelect>}
-    </>
+    </div>
   );
 };
 
