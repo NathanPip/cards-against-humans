@@ -9,11 +9,14 @@ import {
   useStorage,
   useBroadcastEvent,
 } from "../../liveblocks.config";
+import { useGameStore } from "../../pages/lobby/[id]";
+import { Card } from "../../types/game";
 
 const GameManager: React.FC = () => {
   const myId = useSelf((me) => me.id);
   const updatePresence = useUpdateMyPresence();
   const blackCards = useSelf((me) => me.presence.CAHBlackCardIds);
+  const blackCardDeck = useGameStore((state) => state.blackCards);
   const isHost = useSelf((me) => me.presence.isHost);
   const othersDrawing = useOthersMapped(
     (others) => others.presence.currentAction
@@ -39,6 +42,8 @@ const GameManager: React.FC = () => {
     (root) => root.CAH.currentPlayerDrawing
   );
   const connectedPlayers = useStorage((root) => root.CAH.connectedPlayers);
+  const setHand = useGameStore((state) => state.setHand);
+  const whiteCards = useGameStore((state) => state.whiteCards);
 
   ///////////////////////////////// EVENT LISTENER //////////////////////////////////////
 
@@ -103,11 +108,10 @@ const GameManager: React.FC = () => {
 
     // set the next black card
     const currentBlackCard = storage.get("CAH").get("currentBlackCard");
-    const blackCards = storage.get("CAH").get("blackCards");
-    const blackCardIndex = blackCards.indexOf(currentBlackCard);
+    const blackCardIndex = blackCardDeck.indexOf(currentBlackCard);
     const nextBlackCardIndex =
-      blackCardIndex + 1 > blackCards.length - 1 ? 0 : blackCardIndex + 1;
-    const nextBlackCard = blackCards[nextBlackCardIndex];
+      blackCardIndex + 1 > blackCardDeck.length - 1 ? 0 : blackCardIndex + 1;
+    const nextBlackCard = blackCardDeck[nextBlackCardIndex];
     if (!nextBlackCard) throw new Error("No next black card found");
     storage.get("CAH").set("currentBlackCard", nextBlackCard);
 
@@ -231,6 +235,7 @@ const GameManager: React.FC = () => {
       setMyPresence({ currentAction: "waiting" });
       setMyPresence({ CAHturn: true });
     }
+    storage.get("CAH").set("currentBlackCard", blackCardDeck[blackCardDeck.length-1] as Card);
     storage.get("CAH").set("activeState", "waiting for players");
     storage.get("CAH").set("handsRevealed", 0);
     storage.get("CAH").set("started", true);
@@ -239,12 +244,9 @@ const GameManager: React.FC = () => {
 
   useEffect(() => {
     if (
-      isHost &&
-      currentPlayerDrawing === "" &&
-      gameState === "dealing whites"
-    ) {
-      startGame();
-    }
+      gameState === "starting game"
+      ) 
+      if(isHost) startGame();
   }, [isHost, currentPlayerDrawing, gameState, startGame, broadcast]);
 
   // set amount of white cards to pick

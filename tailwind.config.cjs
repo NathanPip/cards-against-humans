@@ -36,6 +36,11 @@ module.exports = {
         5000: "5000ms",
       },
 
+      animationDuration: {
+        2000: "2000ms",
+        3000: "3000ms",
+      },
+
       boxShadow: {
         inset: "inset 0 0 4px 2px rgba(0,0,0,0.2)",
       },

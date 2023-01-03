@@ -4,11 +4,13 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { createContext, useRef, useState } from "react";
+import create from "zustand";
 import ErrorPage from "../../components/Error";
 import Loading from "../../components/Loading";
 import LobbyManager from "../../components/Lobby/LobbyManager";
 import LobbyScreen from "../../components/Lobby/LobbyScreen";
 import { type Presence, RoomProvider } from "../../liveblocks.config";
+import { type Card } from "../../types/game";
 import { trpc } from "../../utils/trpc";
 
 const defaultPlayer: Presence = {
@@ -22,9 +24,34 @@ const defaultPlayer: Presence = {
   CAHturn: false,
   CAHCardsPicked: [],
   CAHCardsRevealed: 0,
+  loadingGame: true,
 };
 
 export const LobbyContext = createContext<null | Lobby>(null);
+
+type GameState = {
+  whiteCards: Card[];
+  blackCards: Card[];
+  hand: Card[];
+  setWhiteCards: (cards: Card[]) => void;
+  setBlackCards: (cards: Card[]) => void;
+  setHand: (cards: Card[]) => void;
+  removeFromHand: (card: Card) => void;
+  addToHand: (card: Card) => void;
+  resetGame: () => void;
+}
+
+export const useGameStore = create<GameState>(set => ({
+  whiteCards: [] as Card[],
+  blackCards: [] as Card[],
+  hand: [] as Card[],
+  setWhiteCards: (cards: Card[]) => set({ whiteCards: cards }),    
+  setBlackCards: (cards: Card[]) => set({ blackCards: cards }),
+  setHand: (cards: Card[]) => set({ hand: cards }),
+  removeFromHand: (card: Card) => set((state) => ({ hand: state.hand.filter(curr => curr.id !== card.id) })),
+  addToHand: (card: Card) => set((state) => ({ hand: [...state.hand, card] })),
+  resetGame: () => set({ whiteCards: [], blackCards: [], hand: [] })
+}))
 
 const GameRoom: NextPage = () => {
   const router = useRouter();
@@ -81,14 +108,14 @@ const NameInput: React.FC<{
 
   return (
     <div className="m-auto flex h-screen w-screen items-center justify-center">
-      <div className=" flex h-96 w-72 flex-col gap-3 rounded-3xl border-2">
+      <div className=" flex h-96 w-72 flex-col gap-3 rounded-3xl border-2 animate-fade-up animate-duration-500 bg-zinc-50 drop-shadow-2xl">
         <h2 className="mb-12 flex justify-center pt-8 text-3xl font-semibold">Enter Your Name</h2>
         <form
           className="flex flex-col items-center justify-evenly h-full gap-3 px-8 pb-8"
           onSubmit={onSubmitHandler}
         >
           <input
-            className="max-w-full rounded-xl tracking-wide text-center text-zinc-900 font-semibold px-3 py-1 placeholder-zinc-900/8"
+            className="max-w-full rounded-xl tracking-wide border-2 border-zinc-900 text-center text-zinc-900 font-semibold px-3 py-1 placeholder-zinc-900/8"
             ref={inputRef}
             type="text"
             placeholder="Don't Be Racist :)"

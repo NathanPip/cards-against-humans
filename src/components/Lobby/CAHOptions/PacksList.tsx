@@ -44,7 +44,7 @@ const PacksList: React.FC<PacksListProps> = ({ cardPacksSelect, data }) => {
               type="checkbox"
               key={pack.id}
               name={pack.name}
-              value={pack.id}
+              value={`${pack.id}_${pack._count.whiteCards}_${pack._count.blackCards}`}
               defaultChecked={index === 0}
             />
           </li>

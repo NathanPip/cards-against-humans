@@ -6,6 +6,7 @@ import {
   useUpdateMyPresence,
   useBroadcastEvent
 } from "../../liveblocks.config";
+import { useGameStore } from "../../pages/lobby/[id]";
 import { type Card } from "../../types/game";
 import WhiteCard from "./WhiteCard";
 
@@ -15,8 +16,7 @@ const PlayerDeck: React.FC = () => {
     (root) => root.CAH.currentPlayerDrawing
   );
   const connectedPlayers = useStorage((root) => root.CAH.connectedPlayers);
-  const whiteCards = useStorage((root) => root.CAH.whiteCards);
-  const currentCardIndex = useStorage((root) => root.CAH.currentWhiteCardIndex);
+  const whiteCards = useGameStore((state) => state.whiteCards);
   const whiteCardsPerPlayer = useStorage(
     (root) => root.CAH.options.whiteCardsPerPlayer
   );
@@ -29,75 +29,19 @@ const PlayerDeck: React.FC = () => {
 
   const isHost = useSelf((me) => me.presence.isHost);
 
-  const [hand, setHand] = useState<{ text: string; id: string }[]>();
-
-  const drawInitialCards = liveblocksMutation(
-    async ({ storage }, nextPlayer: string | undefined) => {
-      if (!currentCardIndex) throw new Error("No current card");
-      const cardsPerPlayer = storage.get("CAH").get("options").get("whiteCardsPerPlayer");
-      storage.get("CAH").set("currentWhiteCardIndex", currentCardIndex - cardsPerPlayer);
-      storage.get("CAH").set("currentPlayerDrawing", nextPlayer);
-    },
-    [currentPlayerDrawing, selfId]
-  );
-
-  const dealWhites = liveblocksMutation(async ({ storage }) => {
-    storage.get("CAH").set("activeState", "dealing whites");
-  }, []);
+  const hand = useGameStore(state => state.hand)
+  const addToHand = useGameStore(state => state.addToHand)
+  const setHand = useGameStore(state => state.setHand)
 
   // Initial Draw BE CAREFUL ** CHECKS FAIL AFTER FIRST FULL RUN THROUGH SO DON'T WORRY TOO MUCH **
   useEffect(() => {
-    if (
-      !selfId ||
-      !whiteCards ||
-      !currentCardIndex ||
-      !whiteCardsPerPlayer ||
-      !connectedPlayers
-    )
-      return;
-    if (gameState === "starting game") dealWhites();
-    if (gameState === "dealing whites") {
-      if (currentPlayerDrawing === selfId) {
-        updatePresence({ currentAction: "drawing" });
-        const hand = whiteCards.slice(
-          currentCardIndex - whiteCardsPerPlayer,
-          currentCardIndex
-        );
-        console.log(hand);
-        const nextPlayer =
-          connectedPlayers[connectedPlayers.length - 1] !== selfId
-            ? connectedPlayers[connectedPlayers.indexOf(selfId) + 1]
-            : "";
-        console.log("next player", nextPlayer);
-        drawInitialCards(
-          nextPlayer,
-        );
-        setHand(hand);
-      }
+    if(!selfId) return;
+    if(gameState === "starting game") {
+      const index = connectedPlayers.indexOf(selfId);
+      const startingHand = whiteCards.splice(index * whiteCardsPerPlayer, whiteCardsPerPlayer);
+      setHand(startingHand);
     }
-  }, [
-    currentPlayerDrawing,
-    selfId,
-    whiteCards,
-    currentCardIndex,
-    whiteCardsPerPlayer,
-    updatePresence,
-    connectedPlayers,
-    drawInitialCards,
-    isHost,
-    gameState,
-    dealWhites,
-    broadcast
-  ]);
-
-  useEffect(() => {
-    const handler = (e: unknown) => {
-      const card = (e as CustomEvent).detail as {card: Card};
-      setHand(prev => prev ? [...prev, card.card] : [card.card]);
-    }
-    window.addEventListener("card picked", handler);
-    return () => window.removeEventListener("card picked", handler);
-  }, [setHand])
+  }, [gameState, selfId, connectedPlayers, whiteCards, whiteCardsPerPlayer, setHand])
 
   useEffect(() => {
     if(!hand) return;
@@ -108,7 +52,7 @@ const PlayerDeck: React.FC = () => {
     <div className="player_deck p-4 mb-4 flex gap-4 overflow-x-scroll overflow-y-visible">
       {hand &&
         hand.map((card, index) => (
-          <WhiteCard card={card} type="hand" setHand={setHand} key={card.id + index*Math.random()}/>
+          <WhiteCard card={card} type="hand" key={card.id + index*Math.random()}/>
         )).reverse()}
         {/* {hand && <CardDeck />} */}
     </div>
