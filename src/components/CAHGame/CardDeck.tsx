@@ -6,12 +6,16 @@ import {
   useBroadcastEvent,
   useEventListener,
 } from "../../liveblocks.config";
+import { useGameStore } from "../../pages/lobby/[id]";
 import PlayerBlackCards from "./PlayerBlackCards";
 
 const CardDeck: React.FC = () => {
   const actionState = useSelf((me) => me.presence.currentAction);
 
   const gameState = useStorage((root) => root.CAH.activeState);
+  const hand = useGameStore((state) => state.hand);
+  const whiteCards = useGameStore((state) => state.whiteCards);
+  const addToHand = useGameStore(state => state.addToHand)
 
   const [animateDraw, setAnimateDraw] = useState(false);
   const [animateWiggle, setAnimateWiggle] = useState(true);
@@ -23,26 +27,22 @@ const CardDeck: React.FC = () => {
   const broadcast = useBroadcastEvent();
 
   const pickCard = liveblocksMutation(({ storage, self, setMyPresence }) => {
-    const currentWhiteCards = self.presence.CAHWhiteCardIds || [];
     const whiteCardsPerPlayer = storage
       .get("CAH")
       .get("options")
       .get("whiteCardsPerPlayer");
-    if (currentWhiteCards.length + 1 >= whiteCardsPerPlayer) {
+    if (hand.length + 1 >= whiteCardsPerPlayer) {
       setMyPresence({ currentAction: "waiting" });
     }
-    const deck = storage.get("CAH").get("whiteCards");
     const currentCard = storage.get("CAH").get("currentWhiteCardIndex");
     if (!currentCard) throw new Error("No current card found while drawing");
-    const index = currentCard - 1 < 0 ? deck.length - 1 : currentCard - 1;
+    const index = currentCard - 1 < 0 ? whiteCards.length - 1 : currentCard - 1;
     setNewCardIndex(index);
-    const nextCard = deck[index];
+    const nextCard = whiteCards[index];
     if (!nextCard) throw new Error("No next card found while drawing");
-    window.dispatchEvent(
-      new CustomEvent("card picked", { detail: { card: nextCard } })
-    );
+    addToHand(nextCard)
     broadcast({ type: "player action", action: "picked card" });
-  }, []);
+  }, [hand]);
 
   useEventListener(({ event }) => {
     if (event.type === "player action") {
@@ -61,7 +61,7 @@ const CardDeck: React.FC = () => {
       return (
         <div
           onClick={() => {
-            if (actionState === "drawing" && gameState !== "dealing whites") {
+            if (actionState === "drawing") {
               pickCard();
               setAnimateDraw(true);
             }

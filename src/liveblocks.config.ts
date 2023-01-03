@@ -38,6 +38,7 @@ export type Presence = {
   CAHCardsPicked?: Required<Card>[];
   CAHCardsToPick?: number;
   CAHCardsRevealed?: number;
+  loadingGame: boolean;
 };
 
 export type Storage = {
@@ -48,8 +49,7 @@ export type Storage = {
     options: CAHGameOptions;
     started: boolean;
     winner: string | null;
-    whiteCards: Card[];
-    blackCards: Card[];
+    cardPackIds: string[];
     cardsInRound: { cards: Required<Card>[]; playerId: string }[] | undefined;
     playerHands: Record<string, Card[]>;
     handsRevealed: number;
@@ -61,7 +61,6 @@ export type Storage = {
     currentPlayerDrawing: string | undefined;
     currentPlayerTurn: string | undefined;
     activeState:
-      | "dealing whites"
       | "starting game"
       | "waiting for players"
       | "players picked"
@@ -85,8 +84,9 @@ type RoomEvents = {
     | "card revealed"
     | "next card"
     | "player action"
+    | "card packs selected"
     | "disconnect player";
-} & { action?: string; data?: { id: string; card: Card }; id?: string };
+} & { action?: string; data?: { id: string; card: Card }; id?: string, cardPacks?: string[] };
 
 export const {
   suspense: {

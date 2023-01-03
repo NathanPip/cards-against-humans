@@ -7,25 +7,24 @@ import {
   useUpdateMyPresence,
   useEventListener,
 } from "../../liveblocks.config";
+import { useGameStore } from "../../pages/lobby/[id]";
 import { type Card } from "../../types/game";
 
 type WhiteCardProps = {
   card: Card;
-  setHand?:
-    | React.Dispatch<React.SetStateAction<Card[] | undefined>>
-    | undefined;
   setRevealedAmt?: React.Dispatch<React.SetStateAction<number>>;
   type: "hand" | "toReveal" | "round";
   isRevealed?: boolean;
 };
 
-const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type, setRevealedAmt, isRevealed }) => {
+const WhiteCard: React.FC<WhiteCardProps> = ({ card, type, setRevealedAmt, isRevealed }) => {
   const isTurn = useSelf((me) => me.presence.CAHturn);
   const actionState = useSelf((me) => me.presence.currentAction);
   const gameState = useStorage((root) => root.CAH.activeState);
   const selfId = useSelf((me) => me.id);
   const cardsRevealed = useSelf((me) => me.presence.CAHCardsRevealed);
   const [revealed, setRevealed] = useState(type === "hand" || isRevealed ? true : false);
+  const removeFromHand = useGameStore((state) => state.removeFromHand);
 
   const broadcast = useBroadcastEvent();
 
@@ -78,11 +77,10 @@ const WhiteCard: React.FC<WhiteCardProps> = ({ card, setHand, type, setRevealedA
       type === "hand" &&
       actionState === "selecting" &&
       gameState === "waiting for players" &&
-      !isTurn &&
-      setHand
+      !isTurn
     ) {
       console.log("hand");
-      setHand((prev) => prev?.filter((prev) => prev !== card));
+      removeFromHand(card);
       selectCard(card);
     } else if (
       type === "round" &&
