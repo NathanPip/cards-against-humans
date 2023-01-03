@@ -37,7 +37,7 @@ const LobbyScreen: React.FC = () => {
             ))}
         </div>
       </div>
-      {isHost && <GameSelect name="Cards Against Humanity"></GameSelect>}
+      {isHost ? <GameSelect name="Cards Against Humanity"></GameSelect> : <h2 className="text-center text-3xl mt-10 font-semibold drop-shadow-lg">Host is taking his time</h2>}
     </div>
   );
 };

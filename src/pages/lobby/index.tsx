@@ -36,16 +36,17 @@ const Lobby: NextPage = () => {
   if(error) return <ErrorPage />
   return (
     <div className="m-auto flex h-screen w-screen items-center justify-center">
-      <div className="flex h-96 w-72 flex-col gap-3 rounded-3xl border-2">
+      <div className="flex h-96 w-72 flex-col gap-3 rounded-3xl border-2 animate-fade-up animate-duration-500 bg-zinc-50 drop-shadow-2xl">
         <h2 className=" mb-12 flex justify-center pt-8 text-3xl font-semibold">Create Lobby</h2>
         <form
           className="flex flex-col items-center justify-evenly h-full gap-3 px-8 pb-8"
           onSubmit={handleSubmit}
         >
           <input
-            className="max-w-full rounded-xl tracking-wide text-center text-zinc-900 font-semibold px-3 py-1"
+            className="max-w-full bg-zinc-50 rounded-xl border-2 border-zinc-900 tracking-wide text-center text-zinc-900 font-semibold px-3 py-1"
             ref={input}
             type="text"
+            placeholder="Lobby Name"
           />
           <button
             className="rounded bg-zinc-900 py-2 px-4 text-xl transition-colors duration-200 text-zinc-50 hover:bg-zinc-50 hover:text-zinc-900"

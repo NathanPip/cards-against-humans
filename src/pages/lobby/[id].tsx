@@ -81,14 +81,14 @@ const NameInput: React.FC<{
 
   return (
     <div className="m-auto flex h-screen w-screen items-center justify-center">
-      <div className=" flex h-96 w-72 flex-col gap-3 rounded-3xl border-2">
+      <div className=" flex h-96 w-72 flex-col gap-3 rounded-3xl border-2 animate-fade-up animate-duration-500 bg-zinc-50 drop-shadow-2xl">
         <h2 className="mb-12 flex justify-center pt-8 text-3xl font-semibold">Enter Your Name</h2>
         <form
           className="flex flex-col items-center justify-evenly h-full gap-3 px-8 pb-8"
           onSubmit={onSubmitHandler}
         >
           <input
-            className="max-w-full rounded-xl tracking-wide text-center text-zinc-900 font-semibold px-3 py-1 placeholder-zinc-900/8"
+            className="max-w-full rounded-xl tracking-wide border-2 border-zinc-900 text-center text-zinc-900 font-semibold px-3 py-1 placeholder-zinc-900/8"
             ref={inputRef}
             type="text"
             placeholder="Don't Be Racist :)"
