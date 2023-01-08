@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { trpc } from "../../utils/trpc";
-import { v4 as uuid } from "uuid";
 import ErrorPage from "../../components/Error";
+import { ObjectId } from "bson";
 
 const Lobby: NextPage = () => {
   const router = useRouter();
@@ -17,7 +17,7 @@ const Lobby: NextPage = () => {
     e.preventDefault();
     try {
       if (!input.current || !input.current.value) return;
-      const lobbyID = uuid();
+      const lobbyID = new ObjectId().toString();
       await lobbyMutation.mutateAsync({
         name: input.current.value,
         id: lobbyID,

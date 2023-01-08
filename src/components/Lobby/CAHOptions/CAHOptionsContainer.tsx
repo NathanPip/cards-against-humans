@@ -16,7 +16,7 @@ type CAHOptionsProps = {
 };
 
 const CardDataType = z.object({
-  id: z.string().cuid(),
+  id: z.string(),
   text: z.string(),
 });
 

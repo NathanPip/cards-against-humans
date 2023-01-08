@@ -146,7 +146,7 @@ const existingPlayersBodyParser = z.object({
     z.object({
       type: z.literal("user"),
       connectionId: z.number(),
-      id: z.string().uuid(),
+      id: z.string(),
       info: z.object({}).nullish(),
     })
   ),
